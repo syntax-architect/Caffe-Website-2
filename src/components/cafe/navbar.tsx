@@ -7,7 +7,7 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
-import { Coffee, Menu, X, ArrowUpRight, ShoppingBag, Monitor } from "lucide-react";
+import { Coffee, Menu, X, ArrowUpRight, ShoppingBag, Lock, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/lib/ui-store";
@@ -28,6 +28,7 @@ export function Navbar() {
   const { scrollY, scrollYProgress } = useScroll();
   const setCartOpen = useUIStore((s) => s.setCartOpen);
   const openKDS = useUIStore((s) => s.openKDS);
+  const openStaff = useUIStore((s) => s.openStaff);
   const cartCount = useCartStore((s) => s.lines.reduce((n, l) => n + l.qty, 0));
 
   useMotionValueEvent(scrollY, "change", (y) => {
@@ -99,6 +100,18 @@ export function Navbar() {
           </ul>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Staff portal entry */}
+            <button
+              type="button"
+              onClick={openStaff}
+              title="Staff sign-in — portal, KDS, QR ordering"
+              aria-label="Staff sign-in"
+              className="hidden h-11 items-center gap-2 rounded-full border border-[#c89b6a]/25 px-4 text-[0.62rem] font-bold uppercase tracking-[0.2em] text-[#a6947f] transition-all duration-300 hover:border-[#c89b6a] hover:text-[#e9d3a8] md:inline-flex"
+            >
+              <Lock className="h-3.5 w-3.5" strokeWidth={1.75} />
+              Staff
+            </button>
+
             {/* KDS entry — staff view */}
             <button
               type="button"
@@ -223,6 +236,22 @@ export function Navbar() {
               transition={{ delay: 0.5 }}
               className="px-8 pb-10"
             >
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  openStaff();
+                }}
+                className="mb-3 flex w-full items-center justify-between rounded-2xl border border-[#c89b6a]/30 bg-[#14100d]/70 px-5 py-4 text-left"
+              >
+                <span className="flex items-center gap-3 text-[0.66rem] font-bold uppercase tracking-[0.24em] text-[#e9d3a8]">
+                  <Lock className="h-4 w-4" />
+                  Staff Portal
+                </span>
+                <span className="font-mono text-[0.55rem] uppercase tracking-[0.2em] text-[#5c5142]">
+                  KDS · QR · Orders
+                </span>
+              </button>
               <button
                 type="button"
                 onClick={() => {

@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { MENU_BY_ID, type MenuItem } from "./cafe-data";
 import { useKDSStore } from "./kds-store";
+import { useUIStore } from "./ui-store";
 
 export interface CartLine {
   id: string;
@@ -61,9 +62,11 @@ export const useCartStore = create<CartState>((set, get) => ({
     const { lines } = get();
     if (lines.length === 0) return null;
     const kds = useKDSStore.getState();
+    const table = useUIStore.getState().table ?? undefined;
     const orderId = kds.createWebOrder(
       lines.map((l) => ({ id: l.id, name: l.name, qty: l.qty })),
-      customer
+      customer,
+      { table }
     );
     if (orderId !== null) set({ lines: [], lastOrderId: orderId });
     return orderId;

@@ -2,27 +2,73 @@
 
 import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useUIStore } from "@/lib/ui-store";
+import { useUIStore, type AppView } from "@/lib/ui-store";
+import { useAuthStore } from "@/lib/auth-store";
 import { CafeSite } from "@/components/cafe/cafe-site";
 import { KDSApp } from "@/components/kds/kds-app";
+import { StaffLogin } from "@/components/staff/staff-login";
+import { StaffPortal } from "@/components/staff/staff-portal";
+
+const VIEW_HASH: Record<AppView, string> = {
+  cafe: "",
+  kds: "#kds",
+  staff: "#staff",
+  portal: "#portal",
+};
+
+function viewFromHash(hash: string): AppView {
+  if (hash.startsWith("#kds")) return "kds";
+  if (hash.startsWith("#portal")) return "portal";
+  if (hash.startsWith("#staff")) return "staff";
+  return "cafe";
+}
 
 export default function Home() {
   const view = useUIStore((s) => s.view);
   const setView = useUIStore((s) => s.setView);
+  const table = useUIStore((s) => s.table);
+  const setTable = useUIStore((s) => s.setTable);
+  const user = useAuthStore((s) => s.user);
 
-  /* ——— deep-link sync: /#kds opens the kitchen display ——— */
+  /* ——— hash deep-links: #kds · #staff · #portal · #table=N ——— */
   useEffect(() => {
     const apply = () => {
-      setView(window.location.hash === "#kds" ? "kds" : "cafe");
+      const h = window.location.hash;
+      const m = h.match(/^#table=(\d{1,2})/);
+      if (m) {
+        const n = Math.min(99, Math.max(1, parseInt(m[1], 10)));
+        setTable(n);
+        setView("cafe");
+        return;
+      }
+      if (!h.startsWith("#table=")) setTable(null);
+      setView(viewFromHash(h));
     };
     apply();
     window.addEventListener("hashchange", apply);
     return () => window.removeEventListener("hashchange", apply);
-  }, [setView]);
+  }, [setView, setTable]);
 
-  /* ——— lock page scroll while the KDS board is open ——— */
+  /* ——— keep the URL bar in sync with programmatic view changes ——— */
   useEffect(() => {
-    document.body.style.overflow = view === "kds" ? "hidden" : "";
+    const want = VIEW_HASH[view];
+    const cur = window.location.hash;
+    if (view === "cafe") {
+      const t = table ? `#table=${table}` : "";
+      if (cur !== t) history.replaceState(null, "", t || window.location.pathname);
+    } else if (cur !== want) {
+      history.replaceState(null, "", want);
+    }
+  }, [view, table]);
+
+  /* ——— auth guard: #portal requires a signed-in staff member ——— */
+  useEffect(() => {
+    if (view === "portal" && !user) setView("staff");
+  }, [view, user, setView]);
+
+  /* ——— lock page scroll while an app view is open ——— */
+  useEffect(() => {
+    document.body.style.overflow = view === "kds" || view === "portal" ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -40,7 +86,7 @@ export default function Home() {
         >
           <CafeSite />
         </motion.div>
-      ) : (
+      ) : view === "kds" ? (
         <motion.div
           key="kds"
           initial={{ opacity: 0, scale: 0.985 }}
@@ -50,6 +96,28 @@ export default function Home() {
           className="h-[100svh]"
         >
           <KDSApp />
+        </motion.div>
+      ) : view === "staff" ? (
+        <motion.div
+          key="staff"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10, transition: { duration: 0.24 } }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="min-h-[100svh]"
+        >
+          <StaffLogin />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="portal"
+          initial={{ opacity: 0, scale: 0.988 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.99, transition: { duration: 0.24 } }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="h-[100svh]"
+        >
+          <StaffPortal />
         </motion.div>
       )}
     </AnimatePresence>

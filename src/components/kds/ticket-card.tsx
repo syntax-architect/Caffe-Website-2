@@ -50,6 +50,7 @@ const CHANNEL_STYLE: Record<string, string> = {
   APP: "bg-[#5f9c74]/15 text-[#8fc9a1] border-[#5f9c74]/40",
   UBER: "bg-[#d9a441]/15 text-[#ecc571] border-[#d9a441]/40",
   PHONE: "bg-[#a6947f]/15 text-[#c9bba6] border-[#a6947f]/40",
+  QR: "bg-[#8f7bd8]/15 text-[#b9aaf0] border-[#8f7bd8]/45",
 };
 
 function TypeIcon({ type }: { type: KDSOrder["type"] }) {
@@ -107,6 +108,11 @@ export function TicketCard({
           <TypeIcon type={order.type} />
           {order.type === "dine-in" ? "dine" : order.type.slice(0, 4)}
         </span>
+        {order.table ? (
+          <span className="flex items-center gap-1 rounded border border-[#8f7bd8]/45 bg-[#8f7bd8]/12 px-1.5 py-px font-mono text-[0.58rem] font-bold tracking-wider text-[#b9aaf0]" title="Dine-in table">
+            T{String(order.table).padStart(2, "0")}
+          </span>
+        ) : null}
         {order.rush && (
           <span className="flex items-center gap-0.5 rounded border border-[#c2543e]/45 bg-[#c2543e]/15 px-1.5 py-px font-mono text-[0.58rem] font-bold text-[#ff9d8a]" title="Rush order">
             <Flame className="h-3 w-3" /> RUSH

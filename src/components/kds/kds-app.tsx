@@ -40,8 +40,9 @@ type KDSViewMode = "grid" | "flow";
  * NOIRÉ KDS — full kitchen display frontend.
  * Live ticket grid + kanban flow, station filters, item check-off,
  * bump/recall, tier alarms, simulated order feed, keyboard-first UX.
+ * When embedded in the staff portal, pass `onExit` to override the exit route.
  */
-export function KDSApp() {
+export function KDSApp({ onExit }: { onExit?: () => void } = {}) {
   const orders = useKDSStore((s) => s.orders);
   const settings = useKDSStore((s) => s.settings);
   const advance = useKDSStore((s) => s.advance);
@@ -53,6 +54,7 @@ export function KDSApp() {
   const updateSettings = useKDSStore((s) => s.updateSettings);
   const injectSimOrder = useKDSStore((s) => s.injectSimOrder);
   const exitKDS = useUIStore((s) => s.exitKDS);
+  const handleExit = onExit ?? exitKDS;
 
   const [now, setNow] = useState(() => Date.now());
   const [viewMode, setViewMode] = useState<KDSViewMode>("grid");
@@ -279,7 +281,7 @@ export function KDSApp() {
           <HeaderBtn onClick={toggleFullscreen} title="Fullscreen">
             {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </HeaderBtn>
-          <HeaderBtn onClick={exitKDS} title="Exit to website" danger>
+          <HeaderBtn onClick={handleExit} title={onExit ? "Back to portal" : "Exit to website"} danger>
             <X className="h-4 w-4" />
             <span className="hidden text-[0.58rem] font-bold uppercase tracking-widest lg:inline">Exit</span>
           </HeaderBtn>

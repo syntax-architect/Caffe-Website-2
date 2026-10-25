@@ -7,7 +7,7 @@ import { MENU, KITCHEN_ONLY } from "./cafe-data";
 /* ————————— Types ————————— */
 
 export type OrderStatus = "new" | "preparing" | "ready" | "done";
-export type OrderChannel = "WEB" | "POS" | "APP" | "UBER" | "PHONE";
+export type OrderChannel = "WEB" | "POS" | "APP" | "UBER" | "PHONE" | "QR";
 export type OrderType = "dine-in" | "takeout" | "delivery";
 export type Station = "BAR" | "KITCHEN";
 
@@ -37,6 +37,8 @@ export interface KDSOrder {
   rush: boolean;
   customer: string;
   source: "sim" | "web";
+  /** dine-in table number (QR table orders + POS dine-in) */
+  table?: number;
   /** lateness tiers already alerted, so sounds don't loop */
   alerted: ("warn" | "late")[];
 }
@@ -56,7 +58,8 @@ interface KDSState {
 
   createWebOrder: (
     lines: { id: string; name: string; qty: number }[],
-    customer?: string
+    customer?: string,
+    opts?: { table?: number }
   ) => number | null;
   injectSimOrder: (ageMinutes?: number) => void;
   advance: (id: string) => void;
@@ -77,7 +80,7 @@ const CUSTOMERS = [
 ];
 
 const CHANNELS: { c: OrderChannel; w: number }[] = [
-  { c: "POS", w: 5 }, { c: "APP", w: 3 }, { c: "WEB", w: 2 }, { c: "UBER", w: 1.5 }, { c: "PHONE", w: 1 },
+  { c: "POS", w: 5 }, { c: "APP", w: 3 }, { c: "QR", w: 2.5 }, { c: "WEB", w: 2 }, { c: "UBER", w: 1.5 }, { c: "PHONE", w: 1 },
 ];
 
 const MODS_POOL: Record<string, string[]> = {
@@ -150,8 +153,13 @@ function dominantStation(items: KDSItem[]): Station {
 
 function orderType(channel: OrderChannel): OrderType {
   if (channel === "UBER") return "delivery";
+  if (channel === "QR") return "dine-in";
   if (channel === "POS") return Math.random() < 0.6 ? "dine-in" : "takeout";
   return Math.random() < 0.75 ? "takeout" : "delivery";
+}
+
+function randomTable(): number {
+  return 1 + Math.floor(Math.random() * 12);
 }
 
 function randomCustomer(): string {
@@ -168,7 +176,7 @@ export const useKDSStore = create<KDSState>()(
       lastBumped: null,
       settings: { sound: true, autoFeed: true, feedMinSec: 14, feedMaxSec: 34 },
 
-      createWebOrder: (lines, customer) => {
+      createWebOrder: (lines, customer, opts) => {
         if (lines.length === 0) return null;
         const num = get().nextNumber;
         const items: KDSItem[] = lines.map((l) => {
@@ -182,18 +190,20 @@ export const useKDSStore = create<KDSState>()(
             done: false,
           };
         });
+        const table = opts?.table;
         const order: KDSOrder = {
           id: uid(),
           number: num,
-          channel: "WEB",
-          type: "takeout",
+          channel: table ? "QR" : "WEB",
+          type: table ? "dine-in" : "takeout",
           station: dominantStation(items),
           items,
           status: "new",
           createdAt: Date.now(),
           rush: false,
-          customer: customer ?? "Web guest",
+          customer: customer ?? (table ? `Table ${table}` : "Web guest"),
           source: "web",
+          table,
           alerted: [],
         };
         set((s) => ({ orders: [order, ...s.orders], nextNumber: s.nextNumber + 1 }));
@@ -203,6 +213,7 @@ export const useKDSStore = create<KDSState>()(
       injectSimOrder: (ageMinutes) => {
         const items = makeSimItems();
         const channel = weightedChannel();
+        const table = channel === "QR" ? randomTable() : undefined;
         const rush = Math.random() < 0.14;
         const allergy = Math.random() < 0.09 ? pick(ALLERGY_POOL) : undefined;
         const note = !allergy && Math.random() < 0.2 ? pick(NOTES_POOL) : undefined;
@@ -219,8 +230,9 @@ export const useKDSStore = create<KDSState>()(
           note,
           allergy,
           rush,
-          customer: randomCustomer(),
+          customer: channel === "QR" ? `Table ${table ?? randomTable()}` : randomCustomer(),
           source: "sim",
+          table: channel === "QR" ? (table ?? randomTable()) : orderType(channel) === "dine-in" && channel === "POS" ? randomTable() : undefined,
           alerted: [],
         };
         set((s) => ({ orders: [order, ...s.orders], nextNumber: s.nextNumber + 1 }));
