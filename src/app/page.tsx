@@ -1,42 +1,57 @@
-import { Navbar } from "@/components/cafe/navbar";
-import { Hero } from "@/components/cafe/hero";
-import { Story } from "@/components/cafe/story";
-import { MenuSection } from "@/components/cafe/menu-section";
-import { Gallery } from "@/components/cafe/gallery";
-import { Testimonials } from "@/components/cafe/testimonials";
-import { Visit, Footer } from "@/components/cafe/visit";
-import { CursorGlow } from "@/components/cafe/cursor-glow";
+"use client";
+
+import { useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useUIStore } from "@/lib/ui-store";
+import { CafeSite } from "@/components/cafe/cafe-site";
+import { KDSApp } from "@/components/kds/kds-app";
 
 export default function Home() {
+  const view = useUIStore((s) => s.view);
+  const setView = useUIStore((s) => s.setView);
+
+  /* ——— deep-link sync: /#kds opens the kitchen display ——— */
+  useEffect(() => {
+    const apply = () => {
+      setView(window.location.hash === "#kds" ? "kds" : "cafe");
+    };
+    apply();
+    window.addEventListener("hashchange", apply);
+    return () => window.removeEventListener("hashchange", apply);
+  }, [setView]);
+
+  /* ——— lock page scroll while the KDS board is open ——— */
+  useEffect(() => {
+    document.body.style.overflow = view === "kds" ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [view]);
+
   return (
-    <div className="grain relative min-h-screen bg-background font-sans text-foreground">
-      {/* Skip link for a11y */}
-      <a
-        href="#craft"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-[#c89b6a] focus:px-5 focus:py-2.5 focus:text-xs focus:font-bold focus:uppercase focus:tracking-widest focus:text-[#14100d]"
-      >
-        Skip to content
-      </a>
-
-      <CursorGlow />
-      <Navbar />
-
-      <main className="relative">
-        {/* 01 — Hero */}
-        <Hero />
-        {/* 02 — The Craft */}
-        <Story />
-        {/* 03 — The Menu */}
-        <MenuSection />
-        {/* 04 — The Space */}
-        <Gallery />
-        {/* 05 — Reviews */}
-        <Testimonials />
-        {/* 06 — Find Us */}
-        <Visit />
-      </main>
-
-      <Footer />
-    </div>
+    <AnimatePresence mode="wait" initial={false}>
+      {view === "cafe" ? (
+        <motion.div
+          key="cafe"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.28 } }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <CafeSite />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="kds"
+          initial={{ opacity: 0, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.99, transition: { duration: 0.24 } }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="h-[100svh]"
+        >
+          <KDSApp />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

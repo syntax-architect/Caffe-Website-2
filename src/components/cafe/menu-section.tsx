@@ -1,58 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, ArrowUpRight } from "lucide-react";
+import { Sparkles, ArrowUpRight, Plus, Check } from "lucide-react";
+import { gsap } from "@/components/gsap/gsap-provider";
 import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
 import { TiltCard } from "./tilt-card";
 import { cn } from "@/lib/utils";
-
-type Category = "espresso" | "brews" | "patisserie";
-
-const CATEGORIES: { id: Category; label: string; hint: string }[] = [
-  { id: "espresso", label: "Espresso Bar", hint: "Pulled to 25 seconds" },
-  { id: "brews", label: "Slow Brews", hint: "Steeped, not rushed" },
-  { id: "patisserie", label: "Patisserie", hint: "Baked at 5 AM" },
-];
-
-interface Item {
-  name: string;
-  note: string;
-  price: string;
-  tag?: string;
-}
-
-const MENU: Record<Category, Item[]> = {
-  espresso: [
-    { name: "The Noir", note: "Double ristretto, cocoa nib, sea salt", price: "4.5", tag: "House icon" },
-    { name: "Honey Cortado", note: "Single-origin espresso, raw honey, silk milk", price: "5.0" },
-    { name: "Black Forest Flat White", note: "Cherry-infused espresso, velvet microfoam", price: "5.5", tag: "Winter" },
-    { name: "Espresso Tonic", note: "Yirgacheffe shot, artisan tonic, burnt orange", price: "6.0" },
-    { name: "Affogato Noir", note: "Vanilla bean gelato drowned in espresso", price: "6.5" },
-    { name: "Caffè Crème", note: "Long extraction, chantilly, nutmeg", price: "4.8" },
-  ],
-  brews: [
-    { name: "Siphon Theatre", note: "Tableside vacuum brew, floral & theatrical", price: "9.0", tag: "Tableside" },
-    { name: "Chemex for Two", note: "600ml slow pour, shared ritual", price: "11.0" },
-    { name: "Cold Brew Noir", note: "18-hour steep, black cherry finish", price: "5.5" },
-    { name: "Kyoto Drip", note: "Ice-dripped for 8 hours, wine-like clarity", price: "8.5", tag: "Limited" },
-    { name: "Matcha Ceremony", note: "Ceremonial-grade, whisked to order", price: "6.5" },
-    { name: "Chai Reverie", note: "House-ground spice, slow-simmered milk", price: "5.8" },
-  ],
-  patisserie: [
-    { name: "Croissant au Beurre", note: "72-hour laminated, French butter", price: "4.2", tag: "Baked daily" },
-    { name: "Pain au Chocolat", note: "Dual batons of 70% Guanaja", price: "4.6" },
-    { name: "Burnt Basque Cheesecake", note: "Caramelised top, molten heart", price: "7.0" },
-    { name: "Cardamom Knot", note: "Brioche, cardamom sugar, orange zest", price: "4.8" },
-    { name: "Pistachio Éclair", note: "Sicilian pistachio crème, gold leaf", price: "6.2", tag: "Signature" },
-    { name: "Seasonal Galette", note: "Ask the counter — always local fruit", price: "5.4" },
-  ],
-};
+import { CATEGORIES, MENU, formatPrice, type Category } from "@/lib/cafe-data";
+import { useCartStore } from "@/lib/cart-store";
+import { useUIStore } from "@/lib/ui-store";
 
 export function MenuSection() {
   const [active, setActive] = useState<Category>("espresso");
+  const [justAdded, setJustAdded] = useState<string | null>(null);
+  const add = useCartStore((s) => s.add);
+  const setCartOpen = useUIStore((s) => s.setCartOpen);
+
+  /* ——— Cursor-following image preview ——— */
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [preview, setPreview] = useState<{ img: string; name: string } | null>(null);
+
+  useEffect(() => {
+    const el = previewRef.current;
+    if (!el) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    const xTo = gsap.quickTo(el, "x", { duration: 0.55, ease: "power3" });
+    const yTo = gsap.quickTo(el, "y", { duration: 0.55, ease: "power3" });
+    const move = (e: PointerEvent) => {
+      xTo(e.clientX);
+      yTo(e.clientY);
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    return () => window.removeEventListener("pointermove", move);
+  }, [preview]);
+
+  function handleAdd(id: string) {
+    const item = MENU.find((m) => m.id === id);
+    if (!item) return;
+    add(item);
+    setJustAdded(id);
+    window.setTimeout(() => setJustAdded((cur) => (cur === id ? null : cur)), 900);
+  }
 
   return (
     <section
@@ -69,6 +60,36 @@ export function MenuSection() {
         className="pointer-events-none absolute -left-52 bottom-0 h-[420px] w-[420px] rounded-full bg-[#9a7248]/6 blur-[120px]"
         aria-hidden
       />
+
+      {/* floating preview that trails the cursor over menu rows */}
+      <div
+        ref={previewRef}
+        aria-hidden
+        className="pointer-events-none fixed left-0 top-0 z-40 hidden -translate-x-1/2 -translate-y-[110%] [@media(pointer:fine)]:block"
+      >
+        <AnimatePresence>
+          {preview && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, rotate: -4 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.85, rotate: 3 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="relative h-44 w-36 overflow-hidden rounded-2xl border border-[#c89b6a]/40 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)]"
+            >
+              <Image
+                src={preview.img}
+                alt=""
+                fill
+                sizes="144px"
+                className="object-cover"
+              />
+              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0a0807]/85 to-transparent px-3 pb-2 pt-6 text-[0.58rem] font-bold uppercase tracking-[0.18em] text-[#e9d3a8]">
+                {preview.name}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
         <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
@@ -144,13 +165,17 @@ export function MenuSection() {
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               className="grid gap-x-12 gap-y-2 sm:grid-cols-2"
             >
-              {MENU[active].map((item, i) => (
+              {MENU.filter((m) => m.category === active).map((item, i) => (
                 <motion.div
-                  key={item.name}
+                  key={item.id}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.06 + i * 0.05, duration: 0.5 }}
-                  className="group rounded-2xl px-4 py-5 transition-colors duration-300 hover:bg-[#14100d]/80"
+                  className="group relative rounded-2xl px-4 py-5 transition-colors duration-300 hover:bg-[#14100d]/80"
+                  onPointerEnter={() =>
+                    setPreview({ img: item.image, name: item.name })
+                  }
+                  onPointerLeave={() => setPreview(null)}
                 >
                   <div className="flex items-baseline">
                     <h3 className="font-display text-lg font-medium text-[#f4eddf] transition-colors duration-300 group-hover:text-[#e9d3a8] sm:text-xl">
@@ -159,7 +184,7 @@ export function MenuSection() {
                     <span className="dot-leader" aria-hidden />
                     <span className="font-display shrink-0 text-lg text-[#c89b6a]">
                       <span className="mr-0.5 text-xs align-top">$</span>
-                      {item.price}
+                      {formatPrice(item.price)}
                     </span>
                   </div>
                   <div className="mt-1.5 flex items-center gap-3">
@@ -173,6 +198,25 @@ export function MenuSection() {
                       </span>
                     )}
                   </div>
+
+                  {/* add to order */}
+                  <button
+                    type="button"
+                    onClick={() => handleAdd(item.id)}
+                    aria-label={`Add ${item.name} to your order`}
+                    className={cn(
+                      "absolute right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border transition-all duration-300",
+                      justAdded === item.id
+                        ? "border-[#7da26b] bg-[#7da26b] text-[#14100d]"
+                        : "border-[#c89b6a]/35 bg-[#0d0a08] text-[#c89b6a] hover:border-[#c89b6a] hover:bg-[#c89b6a] hover:text-[#14100d] sm:opacity-0 sm:group-hover:opacity-100"
+                    )}
+                  >
+                    {justAdded === item.id ? (
+                      <Check className="h-4 w-4" strokeWidth={2.5} />
+                    ) : (
+                      <Plus className="h-4 w-4" strokeWidth={2} />
+                    )}
+                  </button>
                 </motion.div>
               ))}
             </motion.div>
@@ -200,22 +244,36 @@ export function MenuSection() {
                     <h3 className="font-display text-2xl font-medium text-[#f4eddf]">
                       Croissant &amp; The Noir
                     </h3>
-                    <span className="font-display text-2xl text-[#c89b6a]">
-                      $7.5
-                    </span>
+                    <span className="font-display text-2xl text-[#c89b6a]">$7.5</span>
                   </div>
                   <p className="mt-3 text-sm leading-relaxed text-[#a6947f]">
                     The pairing that built our reputation — a 72-hour
                     croissant against a double ristretto. Butter meets
                     bitter; everyone wins.
                   </p>
-                  <a
-                    href="#visit"
-                    className="mt-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-[#e9d3a8] transition-all duration-300 hover:gap-3.5 hover:text-[#c89b6a]"
-                  >
-                    Reserve a table
-                    <ArrowUpRight className="h-4 w-4" />
-                  </a>
+                  <div className="mt-6 flex flex-wrap items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const pair = MENU.find((m) => m.id === "croissant");
+                        const noir = MENU.find((m) => m.id === "noir");
+                        if (pair) add(pair);
+                        if (noir) add(noir);
+                        setCartOpen(true);
+                      }}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#c89b6a] px-5 py-3 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#14100d] transition-all duration-300 hover:scale-[1.03]"
+                    >
+                      <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
+                      Add the pairing
+                    </button>
+                    <a
+                      href="#visit"
+                      className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-[#e9d3a8] transition-all duration-300 hover:gap-3.5 hover:text-[#c89b6a]"
+                    >
+                      Reserve a table
+                      <ArrowUpRight className="h-4 w-4" />
+                    </a>
+                  </div>
                 </div>
               </article>
             </TiltCard>

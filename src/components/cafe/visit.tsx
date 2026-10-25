@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useUIStore } from "@/lib/ui-store";
 
 const HOURS = [
   { days: "Monday — Friday", time: "07:00 — 19:00" },
@@ -389,6 +390,8 @@ export function Visit() {
 export function Footer() {
   const { toast } = useToast();
   const [nl, setNl] = useState("");
+  const openKDS = useUIStore((s) => s.openKDS);
+  const setCartOpen = useUIStore((s) => s.setCartOpen);
 
   return (
     <footer className="relative mt-auto border-t border-[#c89b6a]/15 bg-[#080605]">
@@ -471,6 +474,28 @@ export function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <button
+                  type="button"
+                  onClick={() => setCartOpen(true)}
+                  className="text-sm text-[#a6947f] transition-colors duration-300 hover:text-[#e9d3a8]"
+                >
+                  Order pickup
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={openKDS}
+                  className="group flex items-center gap-2 text-sm text-[#a6947f] transition-colors duration-300 hover:text-[#e9d3a8]"
+                >
+                  Kitchen Display (KDS)
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute h-full w-full animate-ping rounded-full bg-[#7da26b] opacity-70" />
+                    <span className="relative h-1.5 w-1.5 rounded-full bg-[#7da26b]" />
+                  </span>
+                </button>
+              </li>
             </ul>
           </nav>
 

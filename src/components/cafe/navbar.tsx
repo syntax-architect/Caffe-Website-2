@@ -7,9 +7,11 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
-import { Coffee, Menu, X, ArrowUpRight } from "lucide-react";
+import { Coffee, Menu, X, ArrowUpRight, ShoppingBag, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useUIStore } from "@/lib/ui-store";
+import { useCartStore } from "@/lib/cart-store";
 
 const LINKS = [
   { label: "The Craft", href: "#craft" },
@@ -24,6 +26,9 @@ export function Navbar() {
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const { scrollY, scrollYProgress } = useScroll();
+  const setCartOpen = useUIStore((s) => s.setCartOpen);
+  const openKDS = useUIStore((s) => s.openKDS);
+  const cartCount = useCartStore((s) => s.lines.reduce((n, l) => n + l.qty, 0));
 
   useMotionValueEvent(scrollY, "change", (y) => {
     const prev = scrollY.getPrevious() ?? 0;
@@ -93,7 +98,47 @@ export function Navbar() {
             ))}
           </ul>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* KDS entry — staff view */}
+            <button
+              type="button"
+              onClick={openKDS}
+              title="Open the Kitchen Display System"
+              aria-label="Open the Kitchen Display System"
+              className="group hidden h-11 items-center gap-2 rounded-full border border-[#c89b6a]/25 px-4 text-[0.62rem] font-bold uppercase tracking-[0.2em] text-[#a6947f] transition-all duration-300 hover:border-[#c89b6a] hover:text-[#e9d3a8] md:inline-flex"
+            >
+              <Monitor className="h-3.5 w-3.5" strokeWidth={1.75} />
+              KDS
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute h-full w-full animate-ping rounded-full bg-[#7da26b] opacity-70" />
+                <span className="relative h-1.5 w-1.5 rounded-full bg-[#7da26b]" />
+              </span>
+            </button>
+
+            {/* Cart */}
+            <button
+              type="button"
+              onClick={() => setCartOpen(true)}
+              aria-label={`Open your order — ${cartCount} item${cartCount === 1 ? "" : "s"}`}
+              className="relative grid h-11 w-11 place-items-center rounded-full border border-[#c89b6a]/30 text-[#f4eddf] transition-all duration-300 hover:border-[#c89b6a] hover:bg-[#c89b6a]/10"
+            >
+              <ShoppingBag className="h-[1.1rem] w-[1.1rem]" strokeWidth={1.75} />
+              <AnimatePresence>
+                {cartCount > 0 && (
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 22 }}
+                    className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#c89b6a] px-1 font-mono text-[0.6rem] font-bold text-[#14100d]"
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </button>
+
             <Button
               asChild
               size="sm"
@@ -178,6 +223,21 @@ export function Navbar() {
               transition={{ delay: 0.5 }}
               className="px-8 pb-10"
             >
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  openKDS();
+                }}
+                className="mb-5 inline-flex items-center gap-3 rounded-full border border-[#c89b6a]/30 px-5 py-3 text-[0.62rem] font-bold uppercase tracking-[0.24em] text-[#e9d3a8]"
+              >
+                <Monitor className="h-4 w-4" />
+                Kitchen Display · Staff
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute h-full w-full animate-ping rounded-full bg-[#7da26b] opacity-70" />
+                  <span className="relative h-1.5 w-1.5 rounded-full bg-[#7da26b]" />
+                </span>
+              </button>
               <p className="text-xs uppercase tracking-[0.3em] text-[#a6947f]">
                 128 Roaster&apos;s Lane · Open daily 7–19
               </p>

@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Star, Quote } from "lucide-react";
+import { gsap, ScrollTrigger } from "@/components/gsap/gsap-provider";
 import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
 
@@ -108,6 +110,26 @@ function ReviewCard({ review }: { review: Review }) {
 }
 
 export function Testimonials() {
+  const rows = useRef<HTMLDivElement>(null);
+
+  /* Velocity skew — rows lean with scroll speed and spring back. */
+  useEffect(() => {
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const ctx = gsap.context(() => {
+      const skewTo = gsap.quickTo(".reviews-skew", "skewY", { duration: 0.5, ease: "power3" });
+      const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+      ScrollTrigger.create({
+        onUpdate: (self) => skewTo(clamp(self.getVelocity() / -350, -3.5, 3.5)),
+      });
+      // settle back to zero on idle
+      const settle = () => skewTo(0);
+      window.addEventListener("scrollend", settle, { passive: true });
+      return () => window.removeEventListener("scrollend", settle);
+    }, rows);
+    return () => ctx.revert();
+  }, []);
+
   return (
     <section
       id="reviews"
@@ -149,49 +171,53 @@ export function Testimonials() {
       </div>
 
       {/* marquee rows */}
-      <Reveal delay={0.2} amount={0.1}>
-        <div className="marquee-paused relative mt-14 space-y-6">
-          {/* edge fades */}
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#0d0a08] to-transparent sm:w-32"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#0d0a08] to-transparent sm:w-32"
-            aria-hidden
-          />
-
-          <div className="overflow-hidden">
+      <div ref={rows}>
+        <Reveal delay={0.2} amount={0.1}>
+          <div className="marquee-paused relative mt-14 space-y-6">
+            {/* edge fades */}
             <div
-              className="marquee-track py-1"
-              style={{ ["--marquee-duration" as string]: "56s" }}
-            >
-              {[0, 1].map((dup) => (
-                <div key={dup} className="flex shrink-0" aria-hidden={dup === 1}>
-                  {ROW_ONE.map((r) => (
-                    <ReviewCard key={`${dup}-${r.name}`} review={r} />
+              className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#0d0a08] to-transparent sm:w-32"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#0d0a08] to-transparent sm:w-32"
+              aria-hidden
+            />
+
+            <div className="reviews-skew will-transform">
+              <div className="overflow-hidden">
+                <div
+                  className="marquee-track py-1"
+                  style={{ ["--marquee-duration" as string]: "56s" }}
+                >
+                  {[0, 1].map((dup) => (
+                    <div key={dup} className="flex shrink-0" aria-hidden={dup === 1}>
+                      {ROW_ONE.map((r) => (
+                        <ReviewCard key={`${dup}-${r.name}`} review={r} />
+                      ))}
+                    </div>
                   ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div className="overflow-hidden">
-            <div
-              className="marquee-track reverse py-1"
-              style={{ ["--marquee-duration" as string]: "64s" }}
-            >
-              {[0, 1].map((dup) => (
-                <div key={dup} className="flex shrink-0" aria-hidden={dup === 1}>
-                  {ROW_TWO.map((r) => (
-                    <ReviewCard key={`${dup}-${r.name}`} review={r} />
+              <div className="mt-6 overflow-hidden">
+                <div
+                  className="marquee-track reverse py-1"
+                  style={{ ["--marquee-duration" as string]: "64s" }}
+                >
+                  {[0, 1].map((dup) => (
+                    <div key={dup} className="flex shrink-0" aria-hidden={dup === 1}>
+                      {ROW_TWO.map((r) => (
+                        <ReviewCard key={`${dup}-${r.name}`} review={r} />
+                      ))}
+                    </div>
                   ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
-        </div>
-      </Reveal>
+        </Reveal>
+      </div>
     </section>
   );
 }

@@ -1,18 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import {
-  animate,
-  motion,
-  useInView,
-  useScroll,
-  useTransform,
-} from "framer-motion";
 import { Flame, Leaf, HandHeart } from "lucide-react";
+import { gsap } from "@/components/gsap/gsap-provider";
 import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
+import { ChapterSequence } from "./chapters";
 
+/* GSAP-driven counter — counts up when scrolled into view. */
 function Counter({
   to,
   suffix = "",
@@ -23,23 +19,28 @@ function Counter({
   decimals?: number;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.6 });
-  const [value, setValue] = useState(0);
 
   useEffect(() => {
-    if (!inView) return;
-    const controls = animate(0, to, {
-      duration: 2.2,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (v) => setValue(v),
+    const el = ref.current;
+    if (!el) return;
+    const obj = { v: 0 };
+    const ctx = gsap.context(() => {
+      gsap.to(obj, {
+        v: to,
+        duration: 2.2,
+        ease: "power3.out",
+        onUpdate: () => {
+          el.textContent = obj.v.toFixed(decimals) + suffix;
+        },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
+      });
     });
-    return () => controls.stop();
-  }, [inView, to]);
+    return () => ctx.revert();
+  }, [to, suffix, decimals]);
 
   return (
     <span ref={ref}>
-      {value.toFixed(decimals)}
-      {suffix}
+      0{suffix}
     </span>
   );
 }
@@ -71,14 +72,32 @@ const STATS = [
 
 export function Story() {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
 
-  const imgY = useTransform(scrollYProgress, [0, 1], [60, -60]);
-  const img2Y = useTransform(scrollYProgress, [0, 1], [120, -40]);
-  const badgeRotate = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  /* GSAP parallax on the image stack + rotating badge */
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to(".story-img-1", {
+        yPercent: -9,
+        ease: "none",
+        scrollTrigger: { trigger: ref.current, start: "top bottom", end: "bottom top", scrub: true },
+      });
+      gsap.fromTo(
+        ".story-img-2",
+        { yPercent: 14 },
+        {
+          yPercent: -12,
+          ease: "none",
+          scrollTrigger: { trigger: ref.current, start: "top bottom", end: "bottom top", scrub: true },
+        }
+      );
+      gsap.to(".story-badge", {
+        rotate: 140,
+        ease: "none",
+        scrollTrigger: { trigger: ref.current, start: "top bottom", end: "bottom top", scrub: true },
+      });
+    }, ref);
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section
@@ -94,9 +113,9 @@ export function Story() {
       />
 
       <div className="mx-auto grid w-full max-w-7xl items-center gap-16 px-5 sm:px-8 lg:grid-cols-2 lg:gap-24">
-        {/* ——— Image stack with parallax ——— */}
+        {/* ——— Image stack with GSAP parallax ——— */}
         <div className="relative order-2 lg:order-1">
-          <motion.div style={{ y: imgY }} className="relative">
+          <div className="story-img-1 will-transform">
             <Reveal direction="right" amount={0.25}>
               <div className="shine relative overflow-hidden rounded-[2rem] border border-[#c89b6a]/20">
                 <div className="relative aspect-[4/5]">
@@ -111,13 +130,10 @@ export function Story() {
                 </div>
               </div>
             </Reveal>
-          </motion.div>
+          </div>
 
           {/* overlapping secondary image */}
-          <motion.div
-            style={{ y: img2Y }}
-            className="absolute -bottom-10 -right-3 w-2/5 sm:-right-8 sm:w-[46%]"
-          >
+          <div className="story-img-2 absolute -bottom-10 -right-3 w-2/5 will-transform sm:-right-8 sm:w-[46%]">
             <Reveal direction="up" delay={0.2} amount={0.4}>
               <div className="relative overflow-hidden rounded-2xl border-4 border-[#0a0807] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)]">
                 <div className="relative aspect-square">
@@ -131,14 +147,10 @@ export function Story() {
                 </div>
               </div>
             </Reveal>
-          </motion.div>
+          </div>
 
           {/* rotating est. badge */}
-          <motion.div
-            style={{ rotate: badgeRotate }}
-            className="absolute -left-4 -top-8 z-10 sm:-left-8 sm:-top-10"
-            aria-hidden
-          >
+          <div className="story-badge absolute -left-4 -top-8 z-10 sm:-left-8 sm:-top-10" aria-hidden>
             <div className="relative grid h-24 w-24 place-items-center rounded-full border border-[#c89b6a]/40 bg-[#14100d]/90 backdrop-blur-md sm:h-28 sm:w-28">
               <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
                 <defs>
@@ -157,7 +169,7 @@ export function Story() {
                 9<span className="text-sm">yr</span>
               </span>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* ——— Copy ——— */}
@@ -215,6 +227,9 @@ export function Story() {
           </div>
         </div>
       </div>
+
+      {/* ——— Pinned 3D chapter scroll sequence ——— */}
+      <ChapterSequence />
 
       {/* ——— Counters ——— */}
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 sm:mt-32 sm:px-8">
