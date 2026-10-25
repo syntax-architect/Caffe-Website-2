@@ -106,7 +106,7 @@ export function StaffLogin() {
           <footer className="mt-6 flex items-center gap-4">
             <span className="h-px w-10 bg-[#c89b6a]/60" aria-hidden />
             <p className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-[#a6947f]">
-              House operating system · v3
+              House operating system · v4
             </p>
           </footer>
 

@@ -70,3 +70,25 @@ Stage Summary:
 - NOIRÉ v3 shipped: dual-compat (mobile-first + desktop) 6-section SaaS-grade cafe site + full frontend Staff OS — login gate, Overview, live KDS (grid/flow, stations, age tiers, sounds, sim feed, persistence), QR table ordering (real QR generation → guest table mode → table-tagged tickets), Orders log, Menu Manager (86/pricing), Settings
 - Demo credentials surfaced on login: ava@noire.coffee / liam@noire.coffee · noire2026; deep links: #kds, #staff, #portal, #table=N
 - Files touched: src/app/page.tsx, src/components/cafe/{cafe-site,visit,cart-drawer,menu-section,custom-cursor}.tsx, src/components/staff/{qr-ordering,staff-portal,overview}.tsx
+
+---
+Task ID: 4
+Agent: main (Z.ai)
+Task: v4 — more 3D, more scroll-triggering, lazy loading, industry-smooth innovative components, all mobile-compatible
+
+Work Log:
+- Added LazySection (src/components/cafe/lazy-section.tsx): IntersectionObserver-gated mounting (rootMargin 1100px) with NOIRÉ shimmer skeleton; paired with next/dynamic so Gallery, Testimonials, Visit are code-split AND scroll-gated (verified: 3 skeletons at top → 0 after scroll; progressive mount at 75% depth)
+- page.tsx: KDSApp / StaffLogin / StaffPortal now next/dynamic chunks with branded loader — staff-side apps are out of the initial guest bundle; verified #kds, #staff, #portal deep links all stream in correctly
+- New Ritual (src/components/cafe/ritual.tsx): 4-step stacking-cards pinned sequence (Dose/Bloom/Pour/Serve) — cards slide up over the stack while previous cards scale back + dim by depth; scrub-drawn SVG "extraction curve" with dot accents; progress rail + 01/04 counter; reduced-motion static fallback; inserted between Story grid and ChapterSequence
+- New SignatureRing (src/components/cafe/signature-ring.tsx): true CSS-3D preserve-3d ring of 8 signature drinks; responsive radius recomputation (158/198/232px panels); auto-rotate + drag with inertia (pointer events, touch-action pan-y so vertical scroll passes on mobile); front-card auto-highlight (gold border + glow via .ring-front); arrow buttons with snapped tween; IntersectionObserver-gated ticker (zero work off-screen); verified drag inertia (front 0→2→3) and button spin on desktop + mobile render
+- gsap-provider: ScrollTrigger.config({ ignoreMobileResize: true }) — mobile URL-bar resize no longer jitters pins
+- navbar: live closed-loop ticket counter on the KDS button (reads kds-store active orders — "KDS 11" matches the board)
+- globals.css: ring-panel dim/front styles, skeleton-sweep keyframes, reduced-motion additions
+- Staff OS version labels bumped v3 → v4 (login + portal sidebar)
+- Verified E2E (desktop 1440 + mobile 390): preloader→hero, Ritual stack mid-pin (card 02 over dimmed 01), ring 3D + drag + buttons, menu tabs after ring, chapters pin (02/03 mid-3D-crossfade), lazy progressive mounting, KDS full board (11 active tickets, timers, stats), staff portal (Good shift, Ava — all 7 tabs), zero console errors; lint 100% clean
+- Ops: dev server OOM-died once (sandbox 4GB, Chrome+Next compile spike); recovered via init-fullstack.sh (dev.sh path only — no code overwrite); final state: platform-managed server on :3000, Chrome closed to keep memory headroom
+
+Stage Summary:
+- NOIRÉ v4 shipped: +1 pinned scroll sequence (Ritual stacking cards, mobile-safe pin), +1 true-3D interactive component (Signature Roulette ring, touch-draggable), real lazy loading (IO-gated sections + code-split staff apps), mobile scroll hardening (ignoreMobileResize), live site↔KDS closed loop in navbar
+- All 6 sections + KDS + Staff Portal (QR ordering, orders, menu manager, settings) retained and verified
+- Files: +src/components/cafe/{lazy-section,ritual,signature-ring}.tsx; edited cafe-site, menu-section, story, navbar, page.tsx, gsap-provider, globals.css, staff-login, staff-portal

@@ -148,7 +148,7 @@ export function StaffPortal() {
           NOIRÉ<span className="text-[#c89b6a]">.</span>
         </p>
         <p className="font-mono text-[0.55rem] uppercase tracking-[0.3em] text-[#5c5142]">
-          Staff OS · v3
+          Staff OS · v4
         </p>
       </div>
     </div>

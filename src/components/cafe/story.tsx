@@ -6,6 +6,7 @@ import { Flame, Leaf, HandHeart } from "lucide-react";
 import { gsap } from "@/components/gsap/gsap-provider";
 import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
+import { Ritual } from "./ritual";
 import { ChapterSequence } from "./chapters";
 
 /* GSAP-driven counter — counts up when scrolled into view. */
@@ -227,6 +228,9 @@ export function Story() {
           </div>
         </div>
       </div>
+
+      {/* ——— v4: The Ritual — pinned stacking-cards sequence ——— */}
+      <Ritual />
 
       {/* ——— Pinned 3D chapter scroll sequence ——— */}
       <ChapterSequence />

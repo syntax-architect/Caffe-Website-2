@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { QrCode, X } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { GsapSmoother } from "@/components/gsap/gsap-provider";
@@ -11,9 +12,16 @@ import { CartDrawer } from "./cart-drawer";
 import { Hero } from "./hero";
 import { Story } from "./story";
 import { MenuSection } from "./menu-section";
-import { Gallery } from "./gallery";
-import { Testimonials } from "./testimonials";
-import { Visit, Footer } from "./visit";
+import { LazySection } from "./lazy-section";
+
+/* ——— v4 lazy loading: below-fold sections are code-split and only
+   mounted when the guest scrolls within ~1100px of them ——— */
+const Gallery = dynamic(() => import("./gallery").then((m) => m.Gallery));
+const Testimonials = dynamic(() =>
+  import("./testimonials").then((m) => m.Testimonials)
+);
+const Visit = dynamic(() => import("./visit").then((m) => m.Visit));
+const Footer = dynamic(() => import("./visit").then((m) => m.Footer));
 
 /**
  * Floating QR-table context pill — appears when a guest arrives via a
@@ -100,16 +108,22 @@ export function CafeSite() {
         <main className="relative">
           {/* 01 — Hero */}
           <Hero />
-          {/* 02 — The Craft + pinned chapter sequence */}
+          {/* 02 — The Craft + pinned Ritual stack + pinned chapter sequence */}
           <Story />
-          {/* 03 — The Menu */}
+          {/* 03 — The Menu + 3D signature ring */}
           <MenuSection />
-          {/* 04 — The Space (pinned horizontal) */}
-          <Gallery />
-          {/* 05 — Reviews */}
-          <Testimonials />
-          {/* 06 — Find Us */}
-          <Visit />
+          {/* 04 — The Space (pinned horizontal) — lazily mounted */}
+          <LazySection label="The Space" minHeight="85svh">
+            <Gallery />
+          </LazySection>
+          {/* 05 — Reviews — lazily mounted */}
+          <LazySection label="Reviews" minHeight="70svh">
+            <Testimonials />
+          </LazySection>
+          {/* 06 — Find Us — lazily mounted */}
+          <LazySection label="Find Us" minHeight="90svh">
+            <Visit />
+          </LazySection>
         </main>
 
         <Footer />

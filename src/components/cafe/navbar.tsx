@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/lib/ui-store";
 import { useCartStore } from "@/lib/cart-store";
+import { useKDSStore, activeOrders } from "@/lib/kds-store";
 
 const LINKS = [
   { label: "The Craft", href: "#craft" },
@@ -30,6 +31,9 @@ export function Navbar() {
   const openKDS = useUIStore((s) => s.openKDS);
   const openStaff = useUIStore((s) => s.openStaff);
   const cartCount = useCartStore((s) => s.lines.reduce((n, l) => n + l.qty, 0));
+  // v4: live closed loop — the marketing chrome now reflects the real
+  // ticket board, powered by the same store the KDS runs on
+  const liveTickets = useKDSStore((s) => activeOrders(s.orders).length);
 
   useMotionValueEvent(scrollY, "change", (y) => {
     const prev = scrollY.getPrevious() ?? 0;
@@ -122,6 +126,11 @@ export function Navbar() {
             >
               <Monitor className="h-3.5 w-3.5" strokeWidth={1.75} />
               KDS
+              {liveTickets > 0 && (
+                <span className="grid h-4 min-w-4 place-items-center rounded-full bg-[#c89b6a]/20 px-1 font-mono text-[0.55rem] font-bold leading-none text-[#e9d3a8]">
+                  {liveTickets}
+                </span>
+              )}
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute h-full w-full animate-ping rounded-full bg-[#7da26b] opacity-70" />
                 <span className="relative h-1.5 w-1.5 rounded-full bg-[#7da26b]" />

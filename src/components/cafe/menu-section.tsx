@@ -8,6 +8,7 @@ import { gsap } from "@/components/gsap/gsap-provider";
 import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
 import { TiltCard } from "./tilt-card";
+import { SignatureRing } from "./signature-ring";
 import { cn } from "@/lib/utils";
 import { CATEGORIES, MENU, formatPrice, type Category } from "@/lib/cafe-data";
 import { useCartStore } from "@/lib/cart-store";
@@ -107,6 +108,9 @@ export function MenuSection() {
             description="Everything here is made to be drunk in the room it was made for. Prices are honest, portions are generous, and the menu changes when the seasons do."
           />
         </div>
+
+        {/* ——— v4: 3D Signature Roulette ring ——— */}
+        <SignatureRing />
 
         {/* ——— Tabs ——— */}
         <Reveal delay={0.1} className="mt-14">

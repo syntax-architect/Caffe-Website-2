@@ -401,6 +401,32 @@ body.custom-cursor-on select {
   opacity: 1;
 }
 
+/* ————— Signature ring (v4) ————— */
+.ring-panel {
+  opacity: 0.5;
+  transition:
+    opacity 0.45s ease,
+    border-color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+.ring-panel.ring-front {
+  opacity: 1;
+  border-color: rgba(233, 211, 168, 0.85);
+  box-shadow:
+    0 34px 70px -22px rgba(0, 0, 0, 0.85),
+    0 0 44px -10px rgba(200, 155, 106, 0.28);
+}
+
+/* ————— Lazy skeleton sweep ————— */
+@keyframes skeleton-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* ————— KDS ————— */
 .kds-root {
   font-family: var(--font-kds), ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -442,6 +468,9 @@ body.custom-cursor-on select {
   .animate-scroll-dot,
   .text-gold-gradient,
   .kds-late-pulse {
+    animation: none !important;
+  }
+  [data-lazy-skeleton] > span {
     animation: none !important;
   }
   body.custom-cursor-on,

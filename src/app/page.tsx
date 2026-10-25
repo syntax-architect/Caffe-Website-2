@@ -1,13 +1,32 @@
 "use client";
 
 import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import { useUIStore, type AppView } from "@/lib/ui-store";
 import { useAuthStore } from "@/lib/auth-store";
 import { CafeSite } from "@/components/cafe/cafe-site";
-import { KDSApp } from "@/components/kds/kds-app";
-import { StaffLogin } from "@/components/staff/staff-login";
-import { StaffPortal } from "@/components/staff/staff-portal";
+
+/* ——— v4 lazy loading: staff-side apps are code-split out of the
+   initial guest bundle and stream in on first navigation ——— */
+const ViewLoader = () => (
+  <div className="grid h-[100svh] place-items-center bg-[#0a0807]">
+    <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#c89b6a]" />
+  </div>
+);
+
+const KDSApp = dynamic(
+  () => import("@/components/kds/kds-app").then((m) => m.KDSApp),
+  { loading: () => <ViewLoader /> }
+);
+const StaffLogin = dynamic(
+  () => import("@/components/staff/staff-login").then((m) => m.StaffLogin),
+  { loading: () => <ViewLoader /> }
+);
+const StaffPortal = dynamic(
+  () => import("@/components/staff/staff-portal").then((m) => m.StaffPortal),
+  { loading: () => <ViewLoader /> }
+);
 
 const VIEW_HASH: Record<AppView, string> = {
   cafe: "",

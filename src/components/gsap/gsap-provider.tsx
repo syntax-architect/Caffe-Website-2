@@ -7,6 +7,9 @@ import { ScrollSmoother } from "gsap/ScrollSmoother";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+  // v4 mobile hardening: mobile browser chrome (URL bar) resizes the
+  // viewport on scroll — ignore those resizes so pins never jump.
+  ScrollTrigger.config({ ignoreMobileResize: true });
 }
 
 export { gsap, ScrollTrigger, ScrollSmoother };
