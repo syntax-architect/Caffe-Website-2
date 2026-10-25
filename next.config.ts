@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
+const isExport = process.env.NEXT_OUTPUT === "export";
+
 const nextConfig: NextConfig = {
-  output: "standalone",
+  output: isExport ? "export" : "standalone",
+  ...(isExport ? { images: { unoptimized: true } } : {}),
   typescript: {
     ignoreBuildErrors: true,
   },
