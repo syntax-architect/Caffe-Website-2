@@ -92,3 +92,24 @@ Stage Summary:
 - NOIRÉ v4 shipped: +1 pinned scroll sequence (Ritual stacking cards, mobile-safe pin), +1 true-3D interactive component (Signature Roulette ring, touch-draggable), real lazy loading (IO-gated sections + code-split staff apps), mobile scroll hardening (ignoreMobileResize), live site↔KDS closed loop in navbar
 - All 6 sections + KDS + Staff Portal (QR ordering, orders, menu manager, settings) retained and verified
 - Files: +src/components/cafe/{lazy-section,ritual,signature-ring}.tsx; edited cafe-site, menu-section, story, navbar, page.tsx, gsap-provider, globals.css, staff-login, staff-portal
+
+---
+Task ID: 5
+Agent: main (Z.ai)
+Task: v5 — "fix the web view, make it more visually attractive": visual-quality overhaul across the guest-facing site (KDS/Staff flows untouched)
+
+Work Log:
+- Design system (globals.css): +aurora ambient orbs (drift keyframes), +ember gold particles, +section fade bridges, +stack-card solid face w/ lit top edge, +corner-ticks, glass upgraded with inset highlight + depth shadow; ring panels now backface-hidden; +cup-art CSS (saucer/cup/crema conic swirl/gleam); reduced-motion hardened for all new animation classes
+- Hero recomposed: product card no longer clipped (lg:h min(56svh,520px), narrower col), badges pulled inbounds (seal 20px, rating -left-4, lot badge hangs -bottom-10 right-6), headline clamp tightened, copy/CTA margins compressed, stats rebuilt as compact inline strip AND fixed a v4 bug where the dl's opacity-0 class permanently hid it (GSAP only animated children), 2 aurora orbs + 4 desktop embers, mobile radial scrim for copy contrast; hero now fits 100svh exactly incl. marquee (verified via getBoundingClientRect)
+- Ritual stacking sequence fixed (worst v4 offender): cards now solid #16110d faces (.stack-card), incoming card opacity lands at 50% of its rise (no see-through), cards beneath recede (scale -0.055/depth, drift up, brightness to 0.32, alpha 0.55 at depth 2+), lit-pool aurora behind stage — mid-transition frames read as physical layered stack, zero text bleed
+- Chapters: eyebrow rebuilt as glass pill (top-10, z-40, never eclipsed by the 3D deck), rotateY ±34→±20, xPercent ±14→±6, scale 0.92→0.95, static tilts -8/7/-6 → -3.5/3/-3, stage aurora + floor shadow, gold under-glow on card, height min(62svh,600px)
+- Signature Roulette redesigned: 8 per-drink CSS top-view cup arts (core radial + crema conic + gleam + saucer, per-drink palette/angle via CSS vars), backface-visibility hidden (mirrored back text gone), front card "HOUSE SIGNATURE" tag reveal, figcaption on gradient base, watermark moved to bottom corner, ambient pool behind stage
+- Story: stats band glassified + per-cell lucide icons + corner-ticks; feature list gained mono index numbers
+- Gallery: panels get gold-frame hover (border/translate/shadow) + 1.2s image zoom; terminal card +shine
+- Visit: The House card now opens with a pure-CSS stylized map (streets, blocks, gold route line, pulsing pin, district label); Pouring Hours gained a live "Open now / Closed" pill (client-computed, deferred setState for lint)
+- Verification (agent-browser E2E, desktop 1440×900 + mobile 390×844): hero fully in-viewport w/ stats+marquee, ritual mid-transition frames clean (no bleed), chapters pill + cinematic 3D, ring front-tag + no mirrored text, CSS map + OPEN NOW pill on both viewports, KDS board live (4 tickets, timers, stats), staff login → portal (Ava dashboard, KPIs, top sellers) — zero console errors; lint 100% clean
+
+Stage Summary:
+- NOIRÉ v5 shipped: guest-facing visual overhaul — hero composition fits one viewport with every element, both pinned sequences read as premium physical motion instead of broken mid-states, ring drinks have painted identities, visit section gained map + live status; all v4 functionality (KDS, QR ordering, portal, lazy loading, smooth scroll) preserved and re-verified
+- Files: src/app/globals.css, src/components/cafe/{hero,ritual,chapters,signature-ring,story,gallery,visit}.tsx
+- QA shots: assets/qa-v5-*.png (13 captures incl. mid-scroll transition frames)

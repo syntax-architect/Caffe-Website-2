@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import {
   motion,
   useScroll,
@@ -79,6 +79,21 @@ export function Visit() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
+  /* v5 — live open/closed pill (client-only so SSR markup stays stable) */
+  const [openNow, setOpenNow] = useState<boolean | null>(null);
+  useEffect(() => {
+    // deferred so the effect body never sets state synchronously
+    const t = window.setTimeout(() => {
+      const d = new Date();
+      const day = d.getDay(); // 0 = Sunday
+      const h = d.getHours();
+      const open =
+        day === 0 ? h >= 8 && h < 17 : day === 6 ? h >= 8 && h < 20 : h >= 7 && h < 19;
+      setOpenNow(open);
+    }, 0);
+    return () => window.clearTimeout(t);
+  }, []);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [date, setDate] = useState("");
@@ -137,29 +152,59 @@ export function Visit() {
           {/* ——— Info column ——— */}
           <div className="space-y-5">
             <Reveal direction="right">
-              <div className="rounded-3xl border border-[#c89b6a]/15 bg-[#14100d]/70 p-8 sm:p-9">
-                <div className="flex items-start gap-5">
-                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-[#c89b6a]/25 bg-[#1c1611] text-[#c89b6a]">
-                    <MapPin className="h-5 w-5" strokeWidth={1.5} />
+              <div className="group overflow-hidden rounded-3xl border border-[#c89b6a]/15 bg-[#14100d]/70 transition-colors duration-500 hover:border-[#c89b6a]/40">
+                {/* v5 — stylized house map, drawn in CSS */}
+                <div className="relative h-44 overflow-hidden border-b border-[#c89b6a]/10" aria-hidden>
+                  <div className="absolute inset-0 bg-[#0d0a08]" />
+                  {/* streets */}
+                  <div className="absolute -inset-x-8 top-[30%] h-[2px] rotate-[9deg] bg-[#241b12]" />
+                  <div className="absolute -inset-x-8 top-[64%] h-[3px] -rotate-[5deg] bg-[#2b2115]" />
+                  <div className="absolute -inset-y-8 left-[26%] w-[2px] rotate-[12deg] bg-[#241b12]" />
+                  <div className="absolute -inset-y-8 left-[74%] w-[3px] -rotate-[8deg] bg-[#2b2115]" />
+                  {/* Roaster's Lane highlight */}
+                  <div className="absolute left-0 top-[46%] h-px w-full bg-gradient-to-r from-transparent via-[#c89b6a]/40 to-transparent" />
+                  {/* city blocks */}
+                  <div className="absolute left-[12%] top-[14%] h-10 w-14 rounded-md border border-[#c89b6a]/10 bg-[#16110d]" />
+                  <div className="absolute left-[32%] top-[66%] h-9 w-16 rounded-md border border-[#c89b6a]/10 bg-[#16110d]" />
+                  <div className="absolute right-[8%] top-[12%] h-12 w-12 rounded-md border border-[#c89b6a]/10 bg-[#16110d]" />
+                  {/* the pin */}
+                  <div className="absolute left-[58%] top-[36%]">
+                    <span className="absolute -inset-4 animate-ping rounded-full bg-[#c89b6a]/20" />
+                    <span className="absolute -inset-1.5 rounded-full border border-[#c89b6a]/40" />
+                    <span className="grid h-9 w-9 place-items-center rounded-full bg-[#c89b6a] text-[#14100d] shadow-[0_10px_30px_rgba(200,155,106,0.45)]">
+                      <MapPin className="h-4 w-4" strokeWidth={2} />
+                    </span>
+                  </div>
+                  <span className="absolute bottom-3 left-5 font-mono text-[0.55rem] uppercase tracking-[0.3em] text-[#a6947f]/80">
+                    Old Mill District · PDX
                   </span>
-                  <div>
-                    <h3 className="font-display text-xl font-medium text-[#f4eddf]">
-                      The House
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-[#a6947f]">
-                      128 Roaster&apos;s Lane, Old Mill District
-                      <br />
-                      Portland, OR 97209
-                    </p>
-                    <a
-                      href="https://maps.google.com/?q=Portland+OR"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[#c89b6a] transition-colors hover:text-[#e9d3a8]"
-                    >
-                      Get directions
-                      <Send className="h-3 w-3" />
-                    </a>
+                  <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#14100d] to-transparent" />
+                </div>
+
+                <div className="p-8 sm:p-9">
+                  <div className="flex items-start gap-5">
+                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-[#c89b6a]/25 bg-[#1c1611] text-[#c89b6a]">
+                      <MapPin className="h-5 w-5" strokeWidth={1.5} />
+                    </span>
+                    <div>
+                      <h3 className="font-display text-xl font-medium text-[#f4eddf]">
+                        The House
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-[#a6947f]">
+                        128 Roaster&apos;s Lane, Old Mill District
+                        <br />
+                        Portland, OR 97209
+                      </p>
+                      <a
+                        href="https://maps.google.com/?q=Portland+OR"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[#c89b6a] transition-colors hover:text-[#e9d3a8]"
+                      >
+                        Get directions
+                        <Send className="h-3 w-3" />
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -172,9 +217,33 @@ export function Visit() {
                     <Clock className="h-5 w-5" strokeWidth={1.5} />
                   </span>
                   <div className="w-full">
-                    <h3 className="font-display text-xl font-medium text-[#f4eddf]">
-                      Pouring Hours
-                    </h3>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h3 className="font-display text-xl font-medium text-[#f4eddf]">
+                        Pouring Hours
+                      </h3>
+                      {openNow !== null && (
+                        <span
+                          className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[0.58rem] font-bold uppercase tracking-[0.22em] ${
+                            openNow
+                              ? "border-[#8fbf8f]/35 bg-[#8fbf8f]/10 text-[#b8d8b8]"
+                              : "border-[#c89b6a]/25 bg-[#14100d] text-[#a6947f]"
+                          }`}
+                          role="status"
+                        >
+                          <span className="relative flex h-1.5 w-1.5">
+                            {openNow && (
+                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#8fbf8f] opacity-60" />
+                            )}
+                            <span
+                              className={`relative inline-flex h-1.5 w-1.5 rounded-full ${
+                                openNow ? "bg-[#8fbf8f]" : "bg-[#6b5a48]"
+                              }`}
+                            />
+                          </span>
+                          {openNow ? "Open now" : "Closed — see hours"}
+                        </span>
+                      )}
+                    </div>
                     <dl className="mt-3 space-y-2.5">
                       {HOURS.map((h) => (
                         <div

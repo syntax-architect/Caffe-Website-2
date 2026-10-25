@@ -19,7 +19,7 @@ const CHAPTERS = [
     copy: "We travel to origin every harvest, cup blind with the growers, and pay 2.4× fair-trade base. If a lot doesn't move us at the table, it never reaches the roastery.",
     img: "/images/beans-portrait.jpg",
     alt: "Fresh single-origin coffee beans in a roasting drum",
-    tilt: -8,
+    tilt: -3.5,
   },
   {
     index: "02",
@@ -28,7 +28,7 @@ const CHAPTERS = [
     copy: "Our 12kg drum roasts in batches small enough to taste our mistakes before you do. Every roast is logged, curve-matched, and rested 48 hours before it touches the grinder.",
     img: "/images/beans-spoon.jpg",
     alt: "Roasted beans resting after the morning roast",
-    tilt: 7,
+    tilt: 3,
   },
   {
     index: "03",
@@ -37,7 +37,7 @@ const CHAPTERS = [
     copy: "Dialled in at dawn, re-dialled at noon. Every shot is weighed, timed and tasted — because coffee deserves the same reverence as wine, and the room was built to prove it.",
     img: "/images/barista-pour.jpg",
     alt: "Barista pouring latte art at the NOIRÉ bar",
-    tilt: -6,
+    tilt: -3,
   },
 ];
 
@@ -84,10 +84,10 @@ export function ChapterSequence() {
       for (let i = 1; i < chapters.length; i++) {
         const prev = chapters[i - 1];
         const cur = chapters[i];
-        tl.to(prev, { autoAlpha: 0, rotateY: -34, xPercent: -14, scale: 0.92, duration: 1 }, t)
+        tl.to(prev, { autoAlpha: 0, rotateY: -20, xPercent: -6, scale: 0.95, duration: 1 }, t)
           .fromTo(
             cur,
-            { autoAlpha: 0, rotateY: 34, xPercent: 14, scale: 0.92 },
+            { autoAlpha: 0, rotateY: 20, xPercent: 6, scale: 0.95 },
             { autoAlpha: 1, rotateY: 0, xPercent: 0, scale: 1, duration: 1 },
             t
           );
@@ -126,11 +126,21 @@ export function ChapterSequence() {
         ref={stage}
         className="perspective-1200 relative flex h-[100svh] flex-col items-center justify-center overflow-hidden"
       >
-        {/* section micro-header */}
-        <div className="pointer-events-none absolute left-1/2 top-16 z-20 flex -translate-x-1/2 items-center gap-4">
-          <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#c89b6a]" aria-hidden />
+        {/* v5 ambient glow + floor shadow */}
+        <div
+          className="aurora left-1/2 top-[54%] h-[520px] w-[min(88vw,820px)] -translate-x-1/2 -translate-y-1/2 bg-[#c89b6a]/9 [--aurora-duration:24s]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute bottom-[9%] left-1/2 h-14 w-[46%] -translate-x-1/2 rounded-[100%] bg-black/65 blur-2xl"
+          aria-hidden
+        />
+
+        {/* section micro-header — glass pill so the deck never eclipses it */}
+        <div className="pointer-events-none absolute left-1/2 top-10 z-40 flex -translate-x-1/2 items-center gap-3 rounded-full border border-[#c89b6a]/30 bg-[#14100d]/75 px-5 py-2.5 backdrop-blur-md">
+          <span className="h-1.5 w-1.5 rotate-45 bg-[#c89b6a]" aria-hidden />
           <p className="eyebrow whitespace-nowrap">Three acts of craft</p>
-          <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#c89b6a]" aria-hidden />
+          <span className="h-1.5 w-1.5 rotate-45 bg-[#c89b6a]" aria-hidden />
         </div>
 
         {CHAPTERS.map((c, i) => (
@@ -142,7 +152,7 @@ export function ChapterSequence() {
             aria-hidden={i !== 0}
           >
             <div
-              className="shine relative mx-auto h-[min(66svh,640px)] overflow-hidden rounded-[2rem] border border-[#c89b6a]/25 shadow-[0_60px_120px_-40px_rgba(0,0,0,0.85)] will-transform"
+              className="shine relative mx-auto h-[min(62svh,600px)] overflow-hidden rounded-[2rem] border border-[#c89b6a]/25 shadow-[0_60px_120px_-40px_rgba(0,0,0,0.85)] will-transform"
               style={{ rotate: `${c.tilt}deg` }}
             >
               <div className="absolute inset-0 overflow-hidden">
@@ -155,6 +165,7 @@ export function ChapterSequence() {
                 />
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0807]/92 via-[#0a0807]/35 to-[#0a0807]/10" aria-hidden />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_115%,rgba(200,155,106,0.16),transparent_58%)]" aria-hidden />
 
               <div className="absolute inset-x-0 bottom-0 p-7 sm:p-10 lg:p-12">
                 <div className="flex items-end justify-between gap-6">

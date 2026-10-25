@@ -191,16 +191,31 @@ export function Hero() {
           sizes="100vw"
           className="object-cover object-center"
         />
+        {/* v5 aurora ambience */}
+        <div className="aurora right-[6%] top-[4%] h-[420px] w-[420px] bg-[#c89b6a]/14 [--aurora-duration:19s]" />
+        <div className="aurora -left-[10%] bottom-[6%] h-[400px] w-[400px] bg-[#8a5a2e]/14 [--aurora-duration:23s]" />
         {/* floating beans (ScrollSmoother data-speed drift) */}
         <div className="hero-beans absolute right-[12%] top-[18%] h-10 w-10 rotate-12 rounded-full bg-[radial-gradient(circle_at_35%_30%,#6b4f33,#241a10_70%)] opacity-70 shadow-[0_18px_30px_rgba(0,0,0,0.5)]" data-speed="0.85" />
         <div className="hero-beans absolute right-[30%] top-[62%] h-6 w-6 -rotate-12 rounded-full bg-[radial-gradient(circle_at_35%_30%,#6b4f33,#241a10_70%)] opacity-50 shadow-[0_12px_22px_rgba(0,0,0,0.5)]" data-speed="1.18" />
         <div className="hero-beans absolute left-[8%] bottom-[16%] hidden h-8 w-8 rotate-45 rounded-full bg-[radial-gradient(circle_at_35%_30%,#6b4f33,#241a10_70%)] opacity-40 lg:block" data-speed="1.08" />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0807]/92 via-[#0a0807]/68 to-[#0a0807]/30" aria-hidden />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0807]/92 via-[#0a0807]/68 to-[#0a0807]/30 max-lg:to-[#0a0807]/55" aria-hidden />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0a0807] via-transparent to-[#0a0807]/78" aria-hidden />
+      {/* v5 mobile readability scrim behind the copy */}
+      <div
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_48%,rgba(10,8,7,0.78),transparent_62%)] lg:hidden"
+        aria-hidden
+      />
+      {/* v5 ember drift (desktop) */}
+      <div className="pointer-events-none absolute inset-0 hidden lg:block" aria-hidden>
+        <span className="ember left-[16%] top-[68%] [--ember-delay:0s] [--ember-duration:8s] [--ember-x:36px]" />
+        <span className="ember left-[38%] top-[78%] [--ember-delay:3.2s] [--ember-duration:10s] [--ember-x:-28px]" />
+        <span className="ember right-[22%] top-[58%] [--ember-delay:1.6s] [--ember-duration:9s] [--ember-x:-40px]" />
+        <span className="ember right-[9%] top-[74%] [--ember-delay:5s] [--ember-duration:11s] [--ember-x:22px]" />
+      </div>
 
       {/* ——— Content ——— */}
-      <div className="hero-content relative z-10 mx-auto grid w-full max-w-7xl flex-1 items-center gap-14 px-5 pb-24 pt-36 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 lg:pt-40">
+      <div className="hero-content relative z-10 mx-auto grid w-full max-w-7xl flex-1 items-center gap-14 px-5 pb-20 pt-36 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 lg:pb-10 lg:pt-28">
         {/* Left: copy */}
         <div className="max-w-3xl">
           <div className="hero-badge mb-8 inline-flex items-center gap-3 rounded-full border border-[#c89b6a]/30 bg-[#14100d]/50 py-2 pl-3 pr-5 opacity-0 backdrop-blur-md">
@@ -215,7 +230,7 @@ export function Hero() {
 
           <h1
             aria-label="Where coffee becomes ritual."
-            className="perspective-1200 font-display text-[clamp(3.2rem,9.5vw,7.5rem)] font-medium leading-[0.98] tracking-[-0.02em] text-[#f4eddf]"
+            className="perspective-1200 font-display text-[clamp(3.2rem,8.6vw,6.4rem)] font-medium leading-[0.98] tracking-[-0.02em] text-[#f4eddf] [text-shadow:0_2px_40px_rgba(10,8,7,0.55)]"
           >
             <MaskedWords words={[<span key="w">Where</span>, <span key="c">coffee</span>]} />
             <MaskedWords
@@ -226,13 +241,13 @@ export function Hero() {
             />
           </h1>
 
-          <p className="hero-copy mt-8 max-w-xl text-pretty text-base font-medium leading-relaxed text-[#d8ccb8] opacity-0 sm:text-lg">
+          <p className="hero-copy mt-6 max-w-xl text-pretty text-base font-medium leading-relaxed text-[#d8ccb8] opacity-0 [text-shadow:0_1px_16px_rgba(10,8,7,0.9)] sm:text-lg">
             Twelve single origins, one obsessive pursuit. We roast in tiny
             batches at dawn, pull every shot to 25 golden seconds, and serve
             it in a room built for lingering.
           </p>
 
-          <div className="hero-ctas mt-12 flex flex-wrap items-center gap-4">
+          <div className="hero-ctas mt-8 flex flex-wrap items-center gap-4">
             <Magnetic>
               <a
                 href="#menu"
@@ -253,19 +268,19 @@ export function Hero() {
             </Magnetic>
           </div>
 
-          {/* Stats */}
-          <dl className="hero-stats mt-14 grid max-w-lg grid-cols-3 gap-6 border-t border-[#f4eddf]/10 pt-8 opacity-0">
+          {/* Stats — compact inline strip so the whole hero fits one viewport */}
+          <dl className="hero-stats mt-8 flex max-w-xl flex-wrap items-center gap-x-8 gap-y-4 [text-shadow:0_1px_14px_rgba(10,8,7,0.9)]">
             {[
               { value: "12", label: "Single origins" },
               { value: "240k", label: "Cups poured" },
               { value: "4.9", label: "Guest rating" },
             ].map((s) => (
-              <div key={s.label}>
+              <div key={s.label} className="flex items-center gap-3">
                 <dt className="sr-only">{s.label}</dt>
-                <dd className="font-display text-3xl font-medium text-[#e9d3a8] sm:text-4xl">
+                <dd className="font-display text-3xl font-medium text-[#e9d3a8]">
                   {s.value}
                 </dd>
-                <dd className="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[#a6947f]">
+                <dd className="max-w-[6.5rem] text-[0.58rem] font-semibold uppercase leading-tight tracking-[0.22em] text-[#a6947f]">
                   {s.label}
                 </dd>
               </div>
@@ -274,17 +289,17 @@ export function Hero() {
         </div>
 
         {/* Right: 3D tilt card */}
-        <div className="hero-card-col relative mx-auto hidden w-full max-w-sm will-transform opacity-0 sm:block lg:max-w-md">
+        <div className="hero-card-col relative mx-auto hidden w-full max-w-[21rem] will-transform opacity-0 sm:block lg:max-w-[23.5rem]">
           <div className="hero-depth perspective-1200">
             <TiltCard intensity={9} className="group">
               <div className="shine relative overflow-hidden rounded-[2rem] border border-[#c89b6a]/25 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.85)]">
-                <div className="relative aspect-[4/5]">
+                <div className="relative aspect-[4/5] lg:aspect-auto lg:h-[min(56svh,520px)]">
                   <Image
                     src="/images/hero-card.jpg"
                     alt="Signature espresso served at NOIRÉ"
                     fill
                     priority
-                    sizes="(min-width: 1024px) 32rem, 28rem"
+                    sizes="(min-width: 1024px) 24rem, 21rem"
                     className="object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0807]/85 via-transparent to-transparent" />
@@ -311,8 +326,8 @@ export function Hero() {
               </div>
 
               {/* rotating seal */}
-              <div className="hero-seal preserve-3d absolute -right-7 -top-9 z-20" aria-hidden>
-                <div className="relative grid h-24 w-24 place-items-center rounded-full border border-[#c89b6a]/35 bg-[#14100d]/85 backdrop-blur-md">
+              <div className="hero-seal preserve-3d absolute -right-5 -top-7 z-20" aria-hidden>
+                <div className="relative grid h-20 w-20 place-items-center rounded-full border border-[#c89b6a]/35 bg-[#14100d]/85 backdrop-blur-md">
                   <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
                     <defs>
                       <path id="hero-seal-circle" d="M 50,50 m -34,0 a 34,34 0 1,1 68,0 a 34,34 0 1,1 -68,0" />
@@ -323,12 +338,12 @@ export function Hero() {
                       </textPath>
                     </text>
                   </svg>
-                  <Star className="h-5 w-5 fill-[#c89b6a] text-[#c89b6a]" />
+                  <Star className="h-4 w-4 fill-[#c89b6a] text-[#c89b6a]" />
                 </div>
               </div>
 
               {/* floating badge — rating */}
-              <div className="float-a glass absolute -left-5 top-1/3 z-20 flex items-center gap-3 rounded-2xl px-4 py-3 sm:-left-10" style={{ transform: "translateZ(60px)" }}>
+              <div className="float-a glass absolute -left-4 top-[30%] z-20 flex items-center gap-3 rounded-2xl px-4 py-3 sm:-left-7" style={{ transform: "translateZ(60px)" }}>
                 <span className="grid h-9 w-9 place-items-center rounded-full bg-[#c89b6a]/15 text-[#c89b6a]">
                   <Star className="h-4 w-4 fill-[#c89b6a]" />
                 </span>
@@ -341,7 +356,7 @@ export function Hero() {
               </div>
 
               {/* floating badge — origin */}
-              <div className="float-b glass preserve-3d absolute -bottom-6 right-4 z-20 rounded-2xl px-4 py-3" style={{ transform: "translateZ(40px)" }}>
+              <div className="float-b glass preserve-3d absolute -bottom-10 right-6 z-20 rounded-2xl px-4 py-3" style={{ transform: "translateZ(40px)" }}>
                 <p className="text-[0.6rem] font-bold uppercase tracking-[0.24em] text-[#c9bba6]">
                   This week&apos;s lot
                 </p>
@@ -357,7 +372,7 @@ export function Hero() {
       {/* ——— Scroll cue ——— */}
       <a
         href="#craft"
-        className="hero-cue absolute bottom-24 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 text-[#a6947f] opacity-0 transition-colors hover:text-[#e9d3a8] lg:flex"
+        className="hero-cue absolute bottom-20 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 text-[#a6947f] opacity-0 transition-colors hover:text-[#e9d3a8] lg:flex"
         aria-label="Scroll to our story"
       >
         <span className="text-[0.6rem] font-bold uppercase tracking-[0.34em]">Scroll</span>

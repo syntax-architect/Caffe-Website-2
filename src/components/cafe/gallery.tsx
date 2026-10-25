@@ -85,7 +85,7 @@ function Panel({ tile, className }: { tile: Tile; className?: string }) {
   return (
     <figure
       className={cn(
-        "group relative shrink-0 overflow-hidden rounded-[1.75rem] border border-[#c89b6a]/15 will-transform",
+        "group relative shrink-0 overflow-hidden rounded-[1.75rem] border border-[#c89b6a]/15 will-transform transition-[border-color,box-shadow,translate] duration-500 hover:border-[#c89b6a]/45 hover:shadow-[0_44px_90px_-30px_rgba(0,0,0,0.92)] md:hover:-translate-y-1.5",
         tile.w,
         className
       )}
@@ -97,7 +97,7 @@ function Panel({ tile, className }: { tile: Tile; className?: string }) {
           alt={tile.alt}
           fill
           sizes="(min-width: 1024px) 45vw, 90vw"
-          className="object-cover"
+          className="object-cover transition-[scale] duration-[1200ms] ease-out group-hover:scale-[1.05]"
         />
       </div>
       <div
@@ -247,7 +247,7 @@ export function Gallery() {
               <div className="flex w-[60vw] shrink-0 items-center justify-center lg:w-[36vw]">
                 <a
                   href="#visit"
-                  className="group flex aspect-square w-56 flex-col items-center justify-center gap-4 rounded-full border border-[#c89b6a]/30 bg-[#14100d]/60 text-center backdrop-blur-md transition-all duration-500 hover:border-[#c89b6a] hover:bg-[#c89b6a]/10 sm:w-64"
+                  className="group shine flex aspect-square w-56 flex-col items-center justify-center gap-4 rounded-full border border-[#c89b6a]/30 bg-[#14100d]/60 text-center backdrop-blur-md transition-all duration-500 hover:border-[#c89b6a] hover:bg-[#c89b6a]/10 sm:w-64"
                 >
                   <span className="font-display text-2xl italic text-[#e9d3a8] transition-transform duration-500 group-hover:scale-105">
                     Come sit

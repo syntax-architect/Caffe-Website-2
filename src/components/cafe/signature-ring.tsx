@@ -27,23 +27,64 @@ const PICK_IDS = [
   "coldbrew",
 ];
 
-const PANEL_ART = [
-  "linear-gradient(140deg,#3d2a16 0%,#1a120b 70%)",
-  "linear-gradient(140deg,#241a10 0%,#100c08 70%)",
-  "linear-gradient(140deg,#40301c 0%,#1c140c 70%)",
-  "linear-gradient(140deg,#2c2013 0%,#14100a 70%)",
-  "linear-gradient(140deg,#46331d 0%,#1e1610 70%)",
-  "linear-gradient(140deg,#26190f 0%,#120e09 70%)",
-  "linear-gradient(140deg,#3a2b18 0%,#181009 70%)",
-  "linear-gradient(140deg,#302214 0%,#16110b 70%)",
-];
+/* v5 — each drink gets a painted top-view cup: core colour, crema angle,
+   and a tinted panel base, so the ring reads as eight real builds. */
+const DRINK_ART: Record<
+  string,
+  { core: string; crema: string; base: string }
+> = {
+  noir: {
+    core: "radial-gradient(circle at 45% 40%, #4a3418, #1a120a 72%)",
+    crema: "24deg",
+    base: "linear-gradient(150deg,#231708 0%,#110c08 68%)",
+  },
+  kyoto: {
+    core: "radial-gradient(circle at 45% 40%, #5a3d1e, #221507 72%)",
+    crema: "140deg",
+    base: "linear-gradient(150deg,#1f1409 0%,#100c08 68%)",
+  },
+  tonic: {
+    core: "radial-gradient(circle at 45% 40%, #8a5c24, #2c1b0c 72%)",
+    crema: "210deg",
+    base: "linear-gradient(150deg,#2a1c0c 0%,#120d09 68%)",
+  },
+  basque: {
+    core: "radial-gradient(circle at 45% 40%, #d9c4a0, #6b4f33 78%)",
+    crema: "300deg",
+    base: "linear-gradient(150deg,#241a10 0%,#13100a 68%)",
+  },
+  siphon: {
+    core: "radial-gradient(circle at 45% 40%, #6b451f, #241608 72%)",
+    crema: "80deg",
+    base: "linear-gradient(150deg,#261809 0%,#120e09 68%)",
+  },
+  cortado: {
+    core: "radial-gradient(circle at 45% 40%, #a87848, #2e1d10 74%)",
+    crema: "180deg",
+    base: "linear-gradient(150deg,#211509 0%,#110d08 68%)",
+  },
+  affogato: {
+    core: "radial-gradient(circle at 45% 40%, #c9b28a, #33200f 76%)",
+    crema: "40deg",
+    base: "linear-gradient(150deg,#251a0e 0%,#131009 68%)",
+  },
+  coldbrew: {
+    core: "radial-gradient(circle at 45% 40%, #2e2012, #120c07 72%)",
+    crema: "250deg",
+    base: "linear-gradient(150deg,#1c130b 0%,#0f0b08 68%)",
+  },
+};
 
 const N = PICK_IDS.length;
 const STEP = 360 / N;
 
 const ITEMS = PICK_IDS.map((id, i) => {
   const item = MENU.find((m) => m.id === id) ?? MENU[0];
-  return { ...item, art: PANEL_ART[i % PANEL_ART.length], no: i + 1 };
+  return {
+    ...item,
+    art: DRINK_ART[id] ?? DRINK_ART.noir,
+    no: i + 1,
+  };
 });
 
 interface Dims {
@@ -241,6 +282,11 @@ export function SignatureRing() {
         style={{ touchAction: "pan-y" }}
         data-cursor="Drag"
       >
+        {/* v5 ambient pool behind the ring */}
+        <div
+          className="aurora left-1/2 top-1/2 h-[340px] w-[min(84vw,760px)] -translate-x-1/2 -translate-y-1/2 bg-[#c89b6a]/9 [--aurora-duration:22s]"
+          aria-hidden
+        />
         <div className="perspective-1200 absolute inset-0">
           <div
             className="ring-tilt absolute inset-0"
@@ -269,9 +315,24 @@ export function SignatureRing() {
                       : undefined,
                   }}
                 >
+                  {/* v5 painted top-view cup */}
+                  <span
+                    className="cup-art"
+                    aria-hidden
+                    style={{
+                      ["--cup-core" as string]: item.art.core,
+                      ["--crema-from" as string]: item.art.crema,
+                    }}
+                  >
+                    <span className="saucer" />
+                    <span className="cup">
+                      <span className="crema" />
+                      <span className="gleam" />
+                    </span>
+                  </span>
                   {/* giant watermark initial */}
                   <span
-                    className="font-display pointer-events-none absolute -right-3 -top-6 select-none text-[7rem] font-light leading-none text-[#f4eddf]/6"
+                    className="font-display pointer-events-none absolute -bottom-7 -right-2 select-none text-[6rem] font-light leading-none text-[#f4eddf]/6"
                     aria-hidden
                   >
                     {item.name.charAt(0)}
@@ -281,7 +342,14 @@ export function SignatureRing() {
                     className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_18%,rgba(233,211,168,0.14),transparent_55%)]"
                     aria-hidden
                   />
-                  <figcaption className="absolute inset-x-0 bottom-0 flex h-1/2 flex-col justify-end gap-1.5 p-5">
+                  {/* v5 front-facing tag */}
+                  <span
+                    className="ring-tag absolute left-1/2 top-4 -translate-x-1/2 whitespace-nowrap rounded-full border border-[#c89b6a]/40 bg-[#14100d]/70 px-3 py-1 font-mono text-[0.5rem] uppercase tracking-[0.3em] text-[#e9d3a8] backdrop-blur-sm"
+                    aria-hidden
+                  >
+                    House signature
+                  </span>
+                  <figcaption className="absolute inset-x-0 bottom-0 flex h-[44%] flex-col justify-end gap-1.5 bg-gradient-to-t from-[#0f0b08]/85 to-transparent p-5">
                     <p className="font-mono text-[0.55rem] uppercase tracking-[0.3em] text-[#c89b6a]">
                       No. {String(item.no).padStart(2, "0")}
                     </p>
@@ -297,7 +365,7 @@ export function SignatureRing() {
                     </p>
                   </figcaption>
                   <span
-                    className="steam absolute left-1/2 top-[26%] h-10 w-16 -translate-x-1/2"
+                    className="steam absolute left-1/2 top-[7%] h-10 w-16 -translate-x-1/2"
                     aria-hidden
                   >
                     <span />

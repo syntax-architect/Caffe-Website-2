@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { Flame, Leaf, HandHeart } from "lucide-react";
+import { Flame, Leaf, HandHeart, Coffee, BookOpen, CupSoda, Star } from "lucide-react";
 import { gsap } from "@/components/gsap/gsap-provider";
 import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
@@ -65,10 +65,10 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { to: 12, suffix: "", label: "Single origins", decimals: 0 },
-  { to: 38, suffix: "", label: "House recipes", decimals: 0 },
-  { to: 240, suffix: "k", label: "Cups a year", decimals: 0 },
-  { to: 4.9, suffix: "", label: "Guest rating", decimals: 1 },
+  { to: 12, suffix: "", label: "Single origins", decimals: 0, icon: Coffee },
+  { to: 38, suffix: "", label: "House recipes", decimals: 0, icon: BookOpen },
+  { to: 240, suffix: "k", label: "Cups a year", decimals: 0, icon: CupSoda },
+  { to: 4.9, suffix: "", label: "Guest rating", decimals: 1, icon: Star },
 ];
 
 export function Story() {
@@ -215,7 +215,10 @@ export function Story() {
                     <f.icon className="h-5 w-5" strokeWidth={1.5} />
                   </span>
                   <div>
-                    <h3 className="font-display text-lg font-medium text-[#f4eddf]">
+                    <p className="font-mono text-[0.55rem] uppercase tracking-[0.3em] text-[#c89b6a]/70" aria-hidden>
+                      {String(i + 1).padStart(2, "0")}
+                    </p>
+                    <h3 className="font-display mt-0.5 text-lg font-medium text-[#f4eddf]">
                       {f.title}
                     </h3>
                     <p className="mt-1.5 text-sm leading-relaxed text-[#a6947f]">
@@ -238,12 +241,17 @@ export function Story() {
       {/* ——— Counters ——— */}
       <div className="mx-auto mt-24 w-full max-w-7xl px-5 sm:mt-32 sm:px-8">
         <Reveal>
-          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-[#c89b6a]/15 bg-[#c89b6a]/10 lg:grid-cols-4">
+          <dl className="corner-ticks grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-[#c89b6a]/15 bg-[#c89b6a]/10 lg:grid-cols-4">
             {STATS.map((s) => (
               <div
                 key={s.label}
-                className="group bg-[#14100d]/80 px-8 py-10 text-center transition-colors duration-500 hover:bg-[#1c1611] sm:py-12"
+                className="group relative bg-[#16110d]/85 px-8 py-10 text-center backdrop-blur-sm transition-colors duration-500 hover:bg-[#1e1712] sm:py-12"
               >
+                <s.icon
+                  className="absolute right-6 top-6 h-5 w-5 text-[#c89b6a]/25 transition-all duration-500 group-hover:scale-110 group-hover:text-[#c89b6a]/75"
+                  strokeWidth={1.5}
+                  aria-hidden
+                />
                 <dd className="font-display text-4xl font-medium text-[#e9d3a8] transition-transform duration-500 group-hover:scale-105 sm:text-5xl">
                   <Counter to={s.to} suffix={s.suffix} decimals={s.decimals} />
                 </dd>

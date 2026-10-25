@@ -157,7 +157,7 @@ export function Ritual() {
       }
 
       gsap.set(slots[0], { autoAlpha: 1 });
-      gsap.set(slots.slice(1), { autoAlpha: 0, yPercent: 55 });
+      gsap.set(slots.slice(1), { autoAlpha: 0, yPercent: 115, rotate: 2.5 });
 
       const tl = gsap.timeline({
         defaults: { ease: "power2.out" },
@@ -176,26 +176,31 @@ export function Ritual() {
       const BEAT = 0.45;
       for (let i = 1; i < slots.length; i++) {
         const at = i - 1 + BEAT;
-        // next card rises over the stack
-        tl.to(
-          slots[i],
-          {
-            autoAlpha: 1,
-            yPercent: 0,
-            rotate: 0,
-            transformPerspective: 1200,
-            duration: 1,
-          },
-          at
-        );
-        // cards beneath scale back & dim, layered by depth
+        // next card rises over the stack — opacity lands early so the
+        // incoming face never shows the card beneath through it
+        tl.to(slots[i], { autoAlpha: 1, duration: 0.5 }, at)
+          .fromTo(
+            slots[i],
+            { yPercent: 115, rotate: 2.5 },
+            {
+              yPercent: 0,
+              rotate: 0,
+              transformPerspective: 1200,
+              duration: 1,
+            },
+            at
+          );
+        // cards beneath recede into a physical stack: scale back, drift up,
+        // dim hard — so no text ever bleeds through the incoming face
         for (let j = 0; j < i; j++) {
           const depth = i - j;
           tl.to(
             slots[j].querySelector(".ritual-card"),
             {
-              scale: 1 - depth * 0.042,
-              filter: `brightness(${Math.max(0.45, 1 - depth * 0.17)})`,
+              scale: 1 - depth * 0.055,
+              yPercent: -2.4 * depth,
+              filter: `brightness(${Math.max(0.32, 1 - depth * 0.2)})`,
+              autoAlpha: depth >= 2 ? 0.55 : 1,
               duration: 1,
               ease: "power1.out",
             },
@@ -238,6 +243,11 @@ export function Ritual() {
         ref={stage}
         className="perspective-1200 relative mt-6 h-[100svh] overflow-visible"
       >
+        {/* v5 lit pool behind the stack */}
+        <div
+          className="aurora left-1/2 top-1/2 h-[560px] w-[min(90vw,860px)] -translate-x-1/2 -translate-y-1/2 bg-[#c89b6a]/10 [--aurora-duration:21s]"
+          aria-hidden
+        />
         {STEPS.map((s, i) => (
           <div
             key={s.index}
@@ -245,7 +255,7 @@ export function Ritual() {
             style={{ zIndex: 10 + i }}
             aria-hidden={i !== 0}
           >
-            <article className="ritual-card shine relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-[#c89b6a]/25 bg-[#14100d]/95 shadow-[0_70px_140px_-40px_rgba(0,0,0,0.9)] will-transform lg:grid-cols-[1.05fr_0.95fr]">
+            <article className="ritual-card shine stack-card relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-[#c89b6a]/25 will-transform lg:grid-cols-[1.05fr_0.95fr]">
               {/* copy side */}
               <div className="flex flex-col justify-center gap-5 p-8 sm:p-12 lg:p-14">
                 <div className="flex items-center gap-4">
@@ -284,7 +294,7 @@ export function Ritual() {
                   sizes="(min-width: 1024px) 40rem, 92vw"
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#14100d] via-[#14100d]/25 to-transparent max-lg:opacity-70" aria-hidden />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#16110d] via-[#16110d]/25 to-transparent max-lg:opacity-70" aria-hidden />
                 <p
                   className="font-display pointer-events-none absolute bottom-4 right-6 text-7xl font-light leading-none text-[#f4eddf]/15 sm:text-8xl"
                   aria-hidden
