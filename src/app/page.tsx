@@ -41,7 +41,9 @@ export default function Home() {
         setView("cafe");
         return;
       }
-      if (!h.startsWith("#table=")) setTable(null);
+      // keep the QR table context across in-page anchor navigation
+      // (#menu, #craft…) — only a clean URL ends table mode
+      if (h === "" || h === "#") setTable(null);
       setView(viewFromHash(h));
     };
     apply();
@@ -64,6 +66,8 @@ export default function Home() {
   /* ——— auth guard: #portal requires a signed-in staff member ——— */
   useEffect(() => {
     if (view === "portal" && !user) setView("staff");
+    // already signed in? the Staff button drops you straight into the portal
+    if (view === "staff" && user) setView("portal");
   }, [view, user, setView]);
 
   /* ——— lock page scroll while an app view is open ——— */

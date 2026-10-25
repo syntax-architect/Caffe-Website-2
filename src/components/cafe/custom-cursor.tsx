@@ -62,7 +62,7 @@ export function CustomCursor() {
       }
     };
 
-    const onOut = (e: Event) => {
+    const onOut = (e: MouseEvent) => {
       const el = e.target as HTMLElement;
       if (!el?.closest) return;
       const to = e.relatedTarget as HTMLElement | null;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Plus, Minus, Trash2, ShoppingBag, MonitorDot, Receipt } from "lucide-react";
+import { X, Plus, Minus, Trash2, ShoppingBag, MonitorDot, Receipt, QrCode } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useUIStore } from "@/lib/ui-store";
 import { formatPrice } from "@/lib/cafe-data";
@@ -19,6 +19,7 @@ export function CartDrawer() {
   const open = useUIStore((s) => s.cartOpen);
   const setOpen = useUIStore((s) => s.setCartOpen);
   const openKDS = useUIStore((s) => s.openKDS);
+  const table = useUIStore((s) => s.table);
   const { lines, add, increment, decrement, remove, clear, checkout, count, total } = useCartStore();
   const { toast } = useToast();
   const [name, setName] = useState("");
@@ -29,8 +30,12 @@ export function CartDrawer() {
     if (ticket) {
       setPlaced(ticket);
       toast({
-        title: `Ticket #${ticket} sent to the kitchen`,
-        description: "Track it live on the kitchen display.",
+        title: table
+          ? `Ticket #${ticket} sent — Table ${String(table).padStart(2, "0")}`
+          : `Ticket #${ticket} sent to the kitchen`,
+        description: table
+          ? "The bar has your table ticket on the display now."
+          : "Track it live on the kitchen display.",
       });
     }
   }
@@ -72,8 +77,15 @@ export function CartDrawer() {
                 </span>
                 <div>
                   <p className="font-display text-lg text-[#f4eddf]">Your order</p>
-                  <p className="text-[0.6rem] uppercase tracking-[0.24em] text-[#a6947f]">
-                    Pickup · ready in ~8 min
+                  <p className="flex items-center gap-1.5 text-[0.6rem] uppercase tracking-[0.24em] text-[#a6947f]">
+                    {table ? (
+                      <>
+                        <QrCode className="h-3 w-3 text-[#c89b6a]" />
+                        Table {String(table).padStart(2, "0")} · dine-in via QR
+                      </>
+                    ) : (
+                      "Pickup · ready in ~8 min"
+                    )}
                   </p>
                 </div>
               </div>
@@ -98,13 +110,16 @@ export function CartDrawer() {
                 >
                   <Receipt className="h-8 w-8" strokeWidth={1.5} />
                 </motion.div>
-                <p className="eyebrow mt-6">Ticket sent to the bar</p>
+                <p className="eyebrow mt-6">
+                  {table ? `Table ${String(table).padStart(2, "0")} ticket · sent to the bar` : "Ticket sent to the bar"}
+                </p>
                 <p className="font-display mt-3 text-5xl font-medium text-[#f4eddf]">
                   #{placed}
                 </p>
                 <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#a6947f]">
-                  The kitchen display is already lighting up. Watch your
-                  ticket move from queued to ready in real time.
+                  {table
+                    ? `The kitchen display is lighting up with table ${String(table).padStart(2, "0")}'s ticket. It'll walk queued → ready in real time — we'll bring it over.`
+                    : "The kitchen display is already lighting up. Watch your ticket move from queued to ready in real time."}
                 </p>
                 <div className="mt-8 flex w-full flex-col gap-3">
                   <button
@@ -192,7 +207,7 @@ export function CartDrawer() {
                 {/* footer */}
                 <div className="border-t border-[#c89b6a]/15 px-6 py-5">
                   <label htmlFor="cart-name" className="text-[0.6rem] font-bold uppercase tracking-[0.24em] text-[#a6947f]">
-                    Name for the cup
+                    {table ? `Name for the cup · table ${String(table).padStart(2, "0")}` : "Name for the cup"}
                   </label>
                   <input
                     id="cart-name"
@@ -216,7 +231,7 @@ export function CartDrawer() {
                     className="group relative mt-4 w-full overflow-hidden rounded-full bg-[#c89b6a] px-6 py-4 text-xs font-bold uppercase tracking-[0.24em] text-[#14100d] transition-transform hover:scale-[1.01]"
                   >
                     <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                    Send to the kitchen
+                    {table ? "Send to our table" : "Send to the kitchen"}
                   </button>
                   <button
                     type="button"

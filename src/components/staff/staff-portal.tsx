@@ -26,7 +26,7 @@ import { Settings } from "./settings";
 
 type Tab = "overview" | "kds" | "qr" | "orders" | "menu" | "settings";
 
-const NAV: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }>; hint: string }[] = [
+const NAV: { id: Tab; label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; hint: string }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard, hint: "Shift at a glance" },
   { id: "kds", label: "Kitchen · KDS", icon: ChefHat, hint: "Live ticket board" },
   { id: "qr", label: "QR Ordering", icon: QrCode, hint: "Table codes" },

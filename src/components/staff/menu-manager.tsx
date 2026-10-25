@@ -98,7 +98,7 @@ export function MenuManager() {
               )}
             >
               <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[#c89b6a]/15">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                { }
                 <img
                   src={m.image}
                   alt={m.name}

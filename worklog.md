@@ -50,3 +50,23 @@ Stage Summary:
 - NOIRÉ v2: GSAP-engineered cafe site (smoother + 2 pinned scroll sequences + magnetic cursor system + cart→kitchen pipeline) and a complete frontend-only KDS with persistent simulated live feed
 - All 6 sections retained & upgraded; fully responsive; a11y (aria roles/labels, keyboard shortcuts, reduced-motion paths) preserved
 - Files: src/lib/{cafe-data,ui-store,cart-store,kds-store,kds-sound}.ts, src/components/gsap/gsap-provider.tsx, src/components/cafe/{cafe-site,preloader,custom-cursor,magnetic,hero,story,chapters,menu-section,gallery,testimonials,section-heading,navbar,cart-drawer,visit}.tsx, src/components/kds/{kds-app,ticket-card,flow-board,order-detail}.tsx, src/app/{page,layout,globals.css}
+
+---
+Task ID: 3
+Agent: main (Z.ai)
+Task: v3 — mobile+web compatibility hardening, UX fixes (scroll sequence & practical features), Silicon-Valley-SaaS polish, Staff Portal (login → QR ordering etc.) reachable from the last section
+
+Work Log:
+- Recovered in-progress v3 state from worklog + files (staff/* components existed but never verified); fixed build blockers first: missing ShoppingBag import in qr-ordering.tsx, MouseEvent typing in custom-cursor.tsx, NAV icon prop type in staff-portal.tsx, React-Compiler useMemo dep (clockNow) in overview.tsx, 3 unused eslint-disable directives — tsc + eslint now 100% clean
+- v3 requirement "button in last place → staff portal": added a premium Staff-Portal strip to the final Visit section (glass card, live dot, feature chips, STAFF SIGN-IN button) + "Staff Portal" link in footer Explore column; navbar/desktop + mobile drawer entries verified
+- QR closed loop completed end-to-end: new floating TableBanner (fixed pill w/ menu shortcut + exit) for #table=N guests; CartDrawer is now table-aware (header "TABLE 07 · DINE IN VIA QR", name-for-cup label, "Send to our table" CTA, table-specific success copy); fixed critical hash bug in page.tsx — any anchor nav (#menu etc.) used to wipe table context; now only a clean URL ends table mode
+- Auth UX: signed-in staff clicking "Staff" now lands directly in the portal (staff→portal redirect guard); portal restores last tab (persisted)
+- Mobile pass (390×844): verified hero, chapter sequence, menu, footer, cafe drawer, portal (topbar + drawer nav), KDS (compact header, stat tiles, single-column tickets, lifecycle interaction); fixed menu add-button overlapping prices on mobile via pr-16 lane (sm:px-4 restore)
+- Desktop pass (1440×900) E2E via agent-browser: preloader→hero, pinned chapter sequence (02/03 counter), menu tabs, gallery, reviews, visit strip; login error path ("Incorrect password"), demo-chip login, portal Overview KPIs/live tickets, QR Ordering (12 tables, 3 sizes, real QR data-URL, PNG/copy/print actions), embedded + pop-out KDS, Orders log (status+channel filters, bumped ticket visible), Menu Manager (18 items, availability+price), Settings (station name, feed/sound, sliders)
+- Closed-loop ticket tests: website checkout → #107 WEB·TAKE on board (exact items) → START PREP → MARK READY → BUMP → RECALL available; QR deep-link flow → #110 QR·DINE·T07 "Table 7" on board; sim feed interplay (WEB RUSH #105, POS #108, QR #109) all tiered correctly
+- Zero console errors/warnings across all views (only benign below-fold LCP advisories); dev.log healthy (EADDRINUSE line is from the init script's redundant second server, primary serves fine)
+
+Stage Summary:
+- NOIRÉ v3 shipped: dual-compat (mobile-first + desktop) 6-section SaaS-grade cafe site + full frontend Staff OS — login gate, Overview, live KDS (grid/flow, stations, age tiers, sounds, sim feed, persistence), QR table ordering (real QR generation → guest table mode → table-tagged tickets), Orders log, Menu Manager (86/pricing), Settings
+- Demo credentials surfaced on login: ava@noire.coffee / liam@noire.coffee · noire2026; deep links: #kds, #staff, #portal, #table=N
+- Files touched: src/app/page.tsx, src/components/cafe/{cafe-site,visit,cart-drawer,menu-section,custom-cursor}.tsx, src/components/staff/{qr-ordering,staff-portal,overview}.tsx

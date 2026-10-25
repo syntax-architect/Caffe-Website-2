@@ -171,7 +171,7 @@ export function MenuSection() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.06 + i * 0.05, duration: 0.5 }}
-                  className="group relative rounded-2xl px-4 py-5 transition-colors duration-300 hover:bg-[#14100d]/80"
+                  className="group relative rounded-2xl py-5 pl-4 pr-16 transition-colors duration-300 hover:bg-[#14100d]/80 sm:px-4"
                   onPointerEnter={() =>
                     setPreview({ img: item.image, name: item.name })
                   }

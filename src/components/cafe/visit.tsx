@@ -16,9 +16,12 @@ import {
   Facebook,
   Twitter,
   ArrowUp,
+  ArrowUpRight,
   Send,
   CheckCircle2,
+  ChefHat,
   Coffee,
+  QrCode,
 } from "lucide-react";
 import { SectionHeading } from "./section-heading";
 import { Reveal } from "./reveal";
@@ -72,6 +75,7 @@ function BackToTop() {
 
 export function Visit() {
   const { toast } = useToast();
+  const openStaff = useUIStore((s) => s.openStaff);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -382,6 +386,60 @@ export function Visit() {
         </div>
       </div>
 
+      {/* ——— Staff portal strip: the house runs on rails ——— */}
+      <div className="mx-auto w-full max-w-7xl px-5 pb-20 sm:px-8">
+        <Reveal>
+          <button
+            type="button"
+            onClick={openStaff}
+            data-cursor="Enter"
+            className="group relative flex w-full flex-col gap-6 overflow-hidden rounded-3xl border border-[#c89b6a]/20 bg-gradient-to-br from-[#171210] via-[#100d0a] to-[#0a0807] p-7 text-left transition-colors duration-500 hover:border-[#c89b6a]/50 sm:p-9 lg:flex-row lg:items-center lg:justify-between"
+          >
+            <span
+              className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-[#c89b6a]/10 blur-[90px] transition-opacity duration-700 group-hover:opacity-100 sm:opacity-60"
+              aria-hidden
+            />
+            <div className="relative flex items-start gap-5">
+              <span className="hidden h-14 w-14 shrink-0 place-items-center rounded-2xl border border-[#c89b6a]/35 bg-[#14100d] text-[#c89b6a] transition-transform duration-500 group-hover:scale-105 sm:grid">
+                <ChefHat className="h-6 w-6" strokeWidth={1.5} />
+              </span>
+              <div>
+                <p className="flex items-center gap-2 text-[0.6rem] font-bold uppercase tracking-[0.28em] text-[#c89b6a]">
+                  Staff access
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute h-full w-full animate-ping rounded-full bg-[#7da26b] opacity-70" />
+                    <span className="relative h-1.5 w-1.5 rounded-full bg-[#7da26b]" />
+                  </span>
+                </p>
+                <p className="font-display mt-2 text-2xl font-medium leading-snug text-[#f4eddf] sm:text-[1.75rem]">
+                  Running the floor? Enter the{" "}
+                  <em className="text-gold-gradient font-light italic">Staff Portal</em>
+                </p>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#a6947f]">
+                  Kitchen display, QR table ordering, live tickets and menu control —
+                  one sign-in for the whole shift.
+                </p>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  {["Live KDS board", "QR ordering", "Ticket log", "Menu manager"].map((c) => (
+                    <span
+                      key={c}
+                      className="rounded-full border border-[#c89b6a]/20 bg-[#14100d]/60 px-3 py-1.5 text-[0.58rem] font-bold uppercase tracking-[0.18em] text-[#a6947f]"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <span className="relative inline-flex shrink-0 items-center gap-3 self-start rounded-full bg-[#c89b6a] px-7 py-4 text-[0.65rem] font-bold uppercase tracking-[0.24em] text-[#14100d] transition-transform duration-300 group-hover:scale-[1.03] group-active:scale-[0.98] lg:self-center">
+              <QrCode className="h-4 w-4" strokeWidth={2} />
+              Staff sign-in
+              <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </span>
+          </button>
+        </Reveal>
+      </div>
+
       <BackToTop />
     </section>
   );
@@ -391,6 +449,7 @@ export function Footer() {
   const { toast } = useToast();
   const [nl, setNl] = useState("");
   const openKDS = useUIStore((s) => s.openKDS);
+  const openStaff = useUIStore((s) => s.openStaff);
   const setCartOpen = useUIStore((s) => s.setCartOpen);
 
   return (
@@ -494,6 +553,15 @@ export function Footer() {
                     <span className="absolute h-full w-full animate-ping rounded-full bg-[#7da26b] opacity-70" />
                     <span className="relative h-1.5 w-1.5 rounded-full bg-[#7da26b]" />
                   </span>
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={openStaff}
+                  className="text-sm text-[#a6947f] transition-colors duration-300 hover:text-[#e9d3a8]"
+                >
+                  Staff Portal
                 </button>
               </li>
             </ul>

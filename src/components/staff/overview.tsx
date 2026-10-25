@@ -69,8 +69,7 @@ export function Overview({ go }: { go: TabNav }) {
       avg,
       revenue,
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orders]);
+  }, [orders, clockNow]);
 
   const hourly = useMemo(() => {
     const cols: { h: number; v: number; live: boolean }[] = [];

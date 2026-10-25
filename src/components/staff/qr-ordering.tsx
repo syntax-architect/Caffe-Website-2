@@ -11,6 +11,7 @@ import {
   Printer,
   QrCode,
   ScanLine,
+  ShoppingBag,
   Smartphone,
 } from "lucide-react";
 import QRCode from "qrcode";
@@ -275,7 +276,7 @@ export function QrOrdering() {
               </p>
               <div className="mt-4 grid min-h-[190px] place-items-center">
                 {dataUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
+                   
                   <img
                     src={dataUrl}
                     alt={`QR code linking to the NOIRÉ menu for table ${table}`}
